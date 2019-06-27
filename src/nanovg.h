@@ -30,6 +30,8 @@ extern "C" {
 #pragma warning(disable: 4201)  // nonstandard extension used : nameless struct/union
 #endif
 
+#define NANOVG_CLEARTYPE
+
 typedef struct NVGcontext NVGcontext;
 
 struct NVGcolor {
@@ -50,6 +52,9 @@ struct NVGpaint {
 	NVGcolor innerColor;
 	NVGcolor outerColor;
 	int image;
+#ifdef NANOVG_CLEARTYPE
+	int drawingFont;
+#endif
 };
 typedef struct NVGpaint NVGpaint;
 

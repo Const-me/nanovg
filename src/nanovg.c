@@ -2423,6 +2423,9 @@ static void nvg__renderText(NVGcontext* ctx, NVGvertex* verts, int nverts)
 	paint.innerColor.a *= state->alpha;
 	paint.outerColor.a *= state->alpha;
 
+#ifdef NANOVG_CLEARTYPE
+	paint.drawingFont = 1;
+#endif
 	ctx->params.renderTriangles(ctx->params.userPtr, &paint, state->compositeOperation, &state->scissor, verts, nverts);
 
 	ctx->drawCallCount++;

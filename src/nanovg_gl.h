@@ -124,7 +124,8 @@ enum GLNVGshaderType {
 	NSVG_SHADER_FILLGRAD,
 	NSVG_SHADER_FILLIMG,
 	NSVG_SHADER_SIMPLE,
-	NSVG_SHADER_IMG
+	NSVG_SHADER_IMG,
+	NSVG_SHADER_CLEARTYPE,	// Only used when NANOVG_CLEARTYPE is defined
 };
 
 #if NANOVG_GL_USE_UNIFORMBUFFER
@@ -520,6 +521,9 @@ static int glnvg__renderCreate(void* uptr)
 		"#version 300 es\n"
 		"#define NANOVG_GL3 1\n"
 #endif
+#ifdef NANOVG_CLEARTYPE
+		"#define NANOVG_CLEARTYPE 1\n"
+#endif
 
 #if NANOVG_GL_USE_UNIFORMBUFFER
 	"#define USE_UNIFORMBUFFER 1\n"
@@ -638,7 +642,7 @@ void main(void)
 #else
 	float strokeAlpha = 1.0;
 #endif
-	if (type == 0)	// Gradient
+	if (type == 0)		// Gradient, GLNVGshaderType::NSVG_SHADER_FILLGRAD
 	{
 		// Calculate gradient color using box gradient
 		vec2 pt = (paintMat * vec3(fpos,1.0)).xy;
@@ -648,7 +652,7 @@ void main(void)
 		color *= strokeAlpha * scissor;
 		result = color;
 	}
-	else if (type == 1)	// Image
+	else if (type == 1)		// Image, GLNVGshaderType::NSVG_SHADER_FILLIMG
 	{
 		// Calculate color from texture
 		vec2 pt = (paintMat * vec3(fpos,1.0)).xy / extent;
@@ -666,14 +670,12 @@ void main(void)
 		color *= strokeAlpha * scissor;
 		result = color;
 	}
-	else if (type == 2)
+	else if (type == 2)		// Stencil fill, GLNVGshaderType::NSVG_SHADER_SIMPLE
 	{
-		// Stencil fill
 		result = vec4(1,1,1,1);
 	}
-	else if (type == 3)
+	else if (type == 3)		// Textured triangles, GLNVGshaderType::NSVG_SHADER_IMG
 	{
-		// Textured triangles
 #ifdef NANOVG_GL3
 		vec4 color = texture(tex, ftcoord);
 #else
@@ -686,6 +688,25 @@ void main(void)
 		color *= scissor;
 		result = color * innerCol;
 	}
+#ifdef NANOVG_CLEARTYPE
+	else if ( type == 4 )		// GLNVGshaderType::NSVG_SHADER_CLEARTYPE
+	{
+#ifdef NANOVG_GL3
+		vec4 color = texture(tex, ftcoord);
+#else
+		vec4 color = texture2D(tex, ftcoord);
+#endif
+		if (texType == 1)
+			color = vec4(color.xyz*color.w,color.w);
+		if (texType == 2)
+			color = vec4(color.x);
+		color *= scissor;
+		result = color * innerCol;
+
+		// Debug code, pink background
+		result = result * float4( result.w, result.w, result.w, 1.0 ) + float4( 1, 0.5, 1, 1 ) * ( 1.0 - result.w );
+	}
+#endif
 #ifdef NANOVG_GL3
 	outColor = result;
 #else
@@ -948,7 +969,8 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 	frag->strokeMult = (width*0.5f + fringe*0.5f) / fringe;
 	frag->strokeThr = strokeThr;
 
-	if (paint->image != 0) {
+	if (paint->image != 0)
+	{
 		tex = glnvg__findTexture(gl, paint->image);
 		if (tex == NULL) return 0;
 		if ((tex->flags & NVG_IMAGE_FLIPY) != 0) {
@@ -977,7 +999,9 @@ static int glnvg__convertPaint(GLNVGcontext* gl, GLNVGfragUniforms* frag, NVGpai
 			frag->texType = 2.0f;
 		#endif
 //		printf("frag->texType = %d\n", frag->texType);
-	} else {
+	}
+	else
+	{
 		frag->type = NSVG_SHADER_FILLGRAD;
 		frag->radius = paint->radius;
 		frag->feather = paint->feather;
@@ -1525,8 +1549,12 @@ static void glnvg__renderTriangles(void* uptr, NVGpaint* paint, NVGcompositeOper
 	if (call->uniformOffset == -1) goto error;
 	frag = nvg__fragUniformPtr(gl, call->uniformOffset);
 	glnvg__convertPaint(gl, frag, paint, scissor, 1.0f, 1.0f, -1.0f);
-	frag->type = NSVG_SHADER_IMG;
 
+#ifdef NANOVG_CLEARTYPE
+	frag->type = (float)( ( paint->drawingFont ) ? NSVG_SHADER_CLEARTYPE : NSVG_SHADER_IMG );
+#else
+	frag->type = (float)NSVG_SHADER_IMG;
+#endif
 	return;
 
 error:

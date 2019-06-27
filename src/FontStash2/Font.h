@@ -4,40 +4,12 @@
 #include "PlexAlloc/Allocator.hpp"
 #include <unordered_map>
 
-typedef struct FT_LibraryRec_  *FT_Library;
-typedef struct FT_FaceRec_*  FT_Face;
+// We don't need to include FreeType here. Forward declarations are enough, reduce compilation time.
+typedef struct FT_LibraryRec_ *FT_Library;
+typedef struct FT_FaceRec_* FT_Face;
 
 namespace FontStash2
 {
-	struct GlyphKey
-	{
-		unsigned int codepoint;
-		short size;
-		short blur;
-
-		bool operator == ( const GlyphKey &k ) const
-		{
-			return codepoint == k.codepoint && size == k.size && blur == k.blur;
-		}
-
-		GlyphKey() = default;
-
-		GlyphKey( unsigned int cp, short s, short b ) :
-			codepoint( cp ), size( s ), blur( b ) { }
-	};
-
-	struct GlyphKeyHash
-	{
-		std::size_t operator()( const GlyphKey& k ) const
-		{
-			std::size_t hash = 17;
-			hash = hash * 31 + k.codepoint;
-			hash = hash * 31 + (uint16_t)k.size;
-			hash = hash * 31 + (uint16_t)k.blur;
-			return hash;
-		}
-	};
-
 	struct GlyphValue
 	{
 		int index;
@@ -60,6 +32,36 @@ namespace FontStash2
 		float ascender, descender;
 		float lineh;
 
+		// Key for the hash map
+		struct GlyphKey
+		{
+			unsigned int codepoint;
+			short size;
+			short blur;
+
+			bool operator == ( const GlyphKey &k ) const
+			{
+				return codepoint == k.codepoint && size == k.size && blur == k.blur;
+			}
+
+			GlyphKey() = default;
+
+			GlyphKey( unsigned int cp, short s, short b ) :
+				codepoint( cp ), size( s ), blur( b ) { }
+		};
+
+		struct GlyphKeyHash
+		{
+			std::size_t operator()( const GlyphKey& k ) const
+			{
+				std::size_t hash = 17;
+				hash = hash * 31 + k.codepoint;
+				hash = hash * 31 + (uint16_t)k.size;
+				hash = hash * 31 + (uint16_t)k.blur;
+				return hash;
+			}
+		};
+
 		using TAlloc = PlexAlloc::Allocator<std::pair<const GlyphKey, GlyphValue>, 256>;
 		using TGlyphsMap = std::unordered_map<GlyphKey, GlyphValue, GlyphKeyHash, std::equal_to<GlyphKey>, TAlloc>;
 		TGlyphsMap glyphs;
@@ -68,19 +70,23 @@ namespace FontStash2
 
 		void clear();
 
+		GlyphValue* lookupGlyph( const GlyphKey & k ) const;
+
 	public:
 
 		Font( int maxFallbacks );
 		~Font() { clear(); }
 
+		// Load FreeType font
 		bool initialize( FT_Library ftLibrary, const char* name, std::vector<uint8_t>& buffer );
 
+		// Add index of a fallback font
 		bool tryAddFallback( int i );
 
+		// True if the argument is equal to the string in this->name
 		bool hasName( const char* str ) const;
 
-		GlyphValue* lookupGlyph( const GlyphKey & k ) const;
-
+		// Lookup a glyph, returns nullptr if not found
 		GlyphValue* lookupGlyph( unsigned int codepoint, short isize, short blur ) const
 		{
 			return lookupGlyph( GlyphKey{ codepoint, isize, blur } );

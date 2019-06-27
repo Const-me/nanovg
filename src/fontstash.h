@@ -137,7 +137,21 @@ typedef struct FONSttFontImpl FONSttFontImpl;
 
 static FT_Library ftLibrary;
 
-#include "fontstash.tt.inl"
+int fons__tt_init( FONScontext *context )
+{
+	FT_Error ftError;
+	FONS_NOTUSED( context );
+	ftError = FT_Init_FreeType( &ftLibrary );
+	return ftError == 0;
+}
+
+int fons__tt_done( FONScontext *context )
+{
+	FT_Error ftError;
+	FONS_NOTUSED( context );
+	ftError = FT_Done_FreeType( ftLibrary );
+	return ftError == 0;
+}
 
 #else
 
@@ -247,37 +261,6 @@ static int fons__maxi(int a, int b)
 	return a > b ? a : b;
 }
 
-/*
-struct FONSglyph
-{
-	unsigned int codepoint;
-	int index;
-	int next;
-	short size, blur;
-	short x0,y0,x1,y1;
-	short xadv,xoff,yoff;
-};
-typedef struct FONSglyph FONSglyph;
-
-struct FONSfont
-{
-	FONSttFontImpl font;
-	char name[64];
-	unsigned char* data;
-	int dataSize;
-	unsigned char freeData;
-	float ascender;
-	float descender;
-	float lineh;
-	FONSglyph* glyphs;
-	int cglyphs;
-	int nglyphs;
-	int lut[FONS_HASH_LUT_SIZE];
-	int fallbacks[FONS_MAX_FALLBACKS];
-	int nfallbacks;
-};
-typedef struct FONSfont FONSfont; */
-
 struct FONSstate
 {
 	int font;
@@ -289,7 +272,7 @@ struct FONSstate
 };
 typedef struct FONSstate FONSstate;
 
-typedef FontStash2::Atlas FONSatlas;
+using FONSatlas = FontStash2::Atlas;
 
 struct FONScontext
 {

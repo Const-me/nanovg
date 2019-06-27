@@ -27,10 +27,10 @@
     <ClInclude Include="..\..\src\stb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\src\nanovg.c" />
+    <None Include="..\..\src\fontstash.tt.inl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\fontstash.tt.inl" />
+    <ClCompile Include="..\..\src\nanovg.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

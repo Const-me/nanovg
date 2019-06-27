@@ -4,6 +4,7 @@
 #define NANOVG_GL2_IMPLEMENTATION	// Use GL2 implementation.
 #include <nanovg_gl.h>
 #pragma comment( lib, "freetype.lib" )
+#include <fontstash.h>
 
 HRESULT AppWindow::create( int nCmdShow )
 {
@@ -23,6 +24,14 @@ HRESULT AppWindow::createResources( CString& failReason )
 		failReason = L"nvgCreateGL2 failed";
 		return E_FAIL;
 	}
+
+	consolasFont = nvgCreateFont( vg, "Consolas", R"(C:\Windows\Fonts\consola.ttf)" );
+	if( FONS_INVALID == consolasFont )
+	{
+		failReason = L"Unable to load the font";
+		return E_FAIL;
+	}
+
 	return S_OK;
 }
 
@@ -40,5 +49,12 @@ void AppWindow::drawScene( float SecsElapsed )
 	nvgFillColor( vg, nvgRGB( 0xCC, 0xCC, 0xCC ) );
 	nvgRect( vg, 0, 0, windowSize.x, windowSize.y );
 	nvgFill( vg );
+
+	nvgFontFace( vg, "Consolas" );
+	nvgTextAlign( vg, NVG_ALIGN_TOP | NVG_ALIGN_CENTER );
+	nvgFontSize( vg, 24 );
+	nvgFillColor( vg, nvgRGB( 0, 0, 0 ) );
+	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.5f, "Hello, World", nullptr );
+
 	nvgEndFrame( vg );
 }

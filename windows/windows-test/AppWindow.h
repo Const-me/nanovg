@@ -27,4 +27,5 @@ private:
 	NVGcontext* vg = nullptr;
 	float pxRatio;
 	Vector2 windowSize;
+	int consolasFont;
 };

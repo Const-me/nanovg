@@ -10,6 +10,28 @@
 #error You must use FreeType build with FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 #endif
 
+namespace FontStash2
+{
+	static FT_Library ftLibrary = nullptr;
+
+	bool freetypeInit()
+	{
+		if( nullptr != ftLibrary )
+			return true;
+		const FT_Error ftError = FT_Init_FreeType( &ftLibrary );
+		return ftError == 0;
+	}
+
+	bool freetypeDone()
+	{
+		if( nullptr == ftLibrary )
+			return true;
+		const FT_Error ftError = FT_Done_FreeType( ftLibrary );
+		ftLibrary = nullptr;
+		return ftError == 0;
+	}
+}
+
 using namespace FontStash2;
 
 Font::Font( int maxFallbacks )
@@ -27,7 +49,7 @@ bool Font::tryAddFallback( int i )
 	return false;
 }
 
-bool Font::initialize( FT_Library ftLibrary, const char* name, std::vector<uint8_t>& buffer )
+bool Font::initialize( const char* name, std::vector<uint8_t>& buffer )
 {
 	clear();
 

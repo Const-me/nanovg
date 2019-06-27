@@ -78,7 +78,7 @@ namespace FontStash2
 		~Font() { clear(); }
 
 		// Load FreeType font
-		bool initialize( FT_Library ftLibrary, const char* name, std::vector<uint8_t>& buffer );
+		bool initialize( const char* name, std::vector<uint8_t>& buffer );
 
 		// Add index of a fallback font
 		bool tryAddFallback( int i );
@@ -123,4 +123,8 @@ namespace FontStash2
 
 		void fonsLineBounds( bool zeroTopLeft, short isize, float y, float* miny, float* maxy ) const;
 	};
+
+	bool freetypeInit();
+
+	bool freetypeDone();
 }

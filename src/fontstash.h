@@ -1120,33 +1120,26 @@ static void fons__getQuad(FONScontext* stash, FONSfont* font,
 	x1 = (float)(glyph->x1-1);
 	y1 = (float)(glyph->y1-1);
 
-	if (stash->params.flags & FONS_ZERO_TOPLEFT) {
+	if (stash->params.flags & FONS_ZERO_TOPLEFT)
+	{
 		rx = (float)(int)(*x + xoff);
 		ry = (float)(int)(*y + yoff);
-
-		q->x0 = rx;
-		q->y0 = ry;
-		q->x1 = rx + x1 - x0;
 		q->y1 = ry + y1 - y0;
-
-		q->s0 = x0 * stash->itw;
-		q->t0 = y0 * stash->ith;
-		q->s1 = x1 * stash->itw;
-		q->t1 = y1 * stash->ith;
-	} else {
+	}
+	else
+	{
 		rx = (float)(int)(*x + xoff);
 		ry = (float)(int)(*y - yoff);
-
-		q->x0 = rx;
-		q->y0 = ry;
-		q->x1 = rx + x1 - x0;
 		q->y1 = ry - y1 + y0;
-
-		q->s0 = x0 * stash->itw;
-		q->t0 = y0 * stash->ith;
-		q->s1 = x1 * stash->itw;
-		q->t1 = y1 * stash->ith;
 	}
+	q->x0 = rx;
+	q->y0 = ry;
+	q->x1 = rx + x1 - x0;
+
+	q->s0 = x0 * stash->itw;
+	q->t0 = y0 * stash->ith;
+	q->s1 = x1 * stash->itw;
+	q->t1 = y1 * stash->ith;
 
 	*x += (int)(glyph->xadv / 10.0f + 0.5f);
 }

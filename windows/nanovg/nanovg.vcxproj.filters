@@ -42,5 +42,6 @@
     <ClCompile Include="..\..\src\FontStash2\Font.cpp">
       <Filter>FontStash2</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\fontstash.cpp" />
   </ItemGroup>
 </Project>

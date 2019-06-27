@@ -34,6 +34,7 @@
     <ClInclude Include="..\..\src\stb_truetype.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\src\fontstash.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Atlas.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Font.cpp" />
     <ClCompile Include="..\..\src\nanovg.cpp" />

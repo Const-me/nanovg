@@ -8,6 +8,7 @@
     <ClCompile Include="Window\GlWnd.cpp" />
     <ClCompile Include="Window\GlWnd.WM.cpp" />
     <ClCompile Include="AppWindow.cpp" />
+    <ClCompile Include="Utils\dxtk\SimpleMath.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -17,5 +18,9 @@
     <ClInclude Include="Utils\MiscUtils.h" />
     <ClInclude Include="Window\GlWnd.h" />
     <ClInclude Include="AppWindow.h" />
+    <ClInclude Include="Utils\dxtk\SimpleMath.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Utils\dxtk\SimpleMath.inl" />
   </ItemGroup>
 </Project>

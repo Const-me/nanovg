@@ -74,17 +74,25 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>../../src;c:\Program Files\Intel\Embree v2.6.2 x64\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>../../../freetype-2.10.0/objs/$(Platform)/$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>../../src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>../../../freetype-2.10.0/objs/$(Platform)/$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(Platform)\$(Configuration)\</IntDir>
+    <IncludePath>../../src;c:\Program Files\Intel\Embree v2.6.2 x64\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>../../../freetype-2.10.0/objs/$(Platform)/$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>../../src;$(VC_IncludePath);$(WindowsSDK_IncludePath);</IncludePath>
+    <LibraryPath>../../../freetype-2.10.0/objs/$(Platform)/$(Configuration);$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -158,6 +166,7 @@
     <ClInclude Include="AppWindow.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Utils\Assert.h" />
+    <ClInclude Include="Utils\dxtk\SimpleMath.h" />
     <ClInclude Include="Utils\glew\glew.h" />
     <ClInclude Include="Utils\glew\wglew.h" />
     <ClInclude Include="Utils\MiscUtils.h" />
@@ -172,6 +181,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Utils\dxtk\SimpleMath.cpp" />
     <ClCompile Include="Utils\glew\glew.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -186,6 +196,9 @@
     <ProjectReference Include="..\nanovg\nanovg.vcxproj">
       <Project>{d17a59d8-bb33-4b22-9ce2-54fa8e369dc6}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Utils\dxtk\SimpleMath.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

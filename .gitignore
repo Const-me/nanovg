@@ -26,3 +26,11 @@ build/*
 
 ## xcode specific
 *xcuserdata*
+windows/.vs/
+windows/Debug/
+windows/nanovg/Debug/
+windows/nanovg/x64/
+windows/Win32/
+windows/windows-test/Win32/
+windows/windows-test/x64/
+windows/x64/

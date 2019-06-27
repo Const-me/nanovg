@@ -1,5 +1,6 @@
 #pragma once
 #include <Window/GlWnd.h>
+#include <nanovg.h>
 
 class AppWindow : public CGlWnd
 {
@@ -19,5 +20,11 @@ private:
 
 	HRESULT createResources( CString& failReason ) override;
 
+	void initScene( CSize viewportSize ) override;
+
 	void drawScene( float SecsElapsed ) override;
+
+	NVGcontext* vg = nullptr;
+	float pxRatio;
+	Vector2 windowSize;
 };

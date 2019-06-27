@@ -19,8 +19,14 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\src\fontstash.enums.h" />
     <ClInclude Include="..\..\src\fontstash.h" />
     <ClInclude Include="..\..\src\FontStash2\Atlas.h" />
+    <ClInclude Include="..\..\src\FontStash2\Font.h" />
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Allocator.hpp" />
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\FreeList.hpp" />
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\MemAlloc.hpp" />
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Plex.hpp" />
     <ClInclude Include="..\..\src\nanovg.h" />
     <ClInclude Include="..\..\src\nanovg_gl.h" />
     <ClInclude Include="..\..\src\nanovg_gl_utils.h" />
@@ -32,6 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\FontStash2\Atlas.cpp" />
+    <ClCompile Include="..\..\src\FontStash2\Font.cpp" />
     <ClCompile Include="..\..\src\nanovg.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

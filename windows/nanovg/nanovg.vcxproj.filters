@@ -10,14 +10,36 @@
     <ClInclude Include="..\..\src\FontStash2\Atlas.h">
       <Filter>FontStash2</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\FontStash2\Font.h">
+      <Filter>FontStash2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Allocator.hpp">
+      <Filter>FontStash2\PlexAlloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\FreeList.hpp">
+      <Filter>FontStash2\PlexAlloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\MemAlloc.hpp">
+      <Filter>FontStash2\PlexAlloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Plex.hpp">
+      <Filter>FontStash2\PlexAlloc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fontstash.enums.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="FontStash2">
       <UniqueIdentifier>{1944613c-689c-48c7-8d99-8755a7a91432}</UniqueIdentifier>
     </Filter>
+    <Filter Include="FontStash2\PlexAlloc">
+      <UniqueIdentifier>{c0e139f7-c32f-4ac2-b708-010d60cdf9af}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\FontStash2\Atlas.cpp">
+      <Filter>FontStash2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\FontStash2\Font.cpp">
       <Filter>FontStash2</Filter>
     </ClCompile>
   </ItemGroup>

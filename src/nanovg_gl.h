@@ -528,25 +528,27 @@ static int glnvg__renderCreate(void* uptr)
 #endif
 	"\n";
 
-	static const char* fillVertShader =
-		"#ifdef NANOVG_GL3\n"
-		"	uniform vec2 viewSize;\n"
-		"	in vec2 vertex;\n"
-		"	in vec2 tcoord;\n"
-		"	out vec2 ftcoord;\n"
-		"	out vec2 fpos;\n"
-		"#else\n"
-		"	uniform vec2 viewSize;\n"
-		"	attribute vec2 vertex;\n"
-		"	attribute vec2 tcoord;\n"
-		"	varying vec2 ftcoord;\n"
-		"	varying vec2 fpos;\n"
-		"#endif\n"
-		"void main(void) {\n"
-		"	ftcoord = tcoord;\n"
-		"	fpos = vertex;\n"
-		"	gl_Position = vec4(2.0*vertex.x/viewSize.x - 1.0, 1.0 - 2.0*vertex.y/viewSize.y, 0, 1);\n"
-		"}\n";
+	static const char* fillVertShader = R"fffuuu(
+#ifdef NANOVG_GL3
+	uniform vec2 viewSize;
+	in vec2 vertex;
+	in vec2 tcoord;
+	out vec2 ftcoord;
+	out vec2 fpos;
+#else
+	uniform vec2 viewSize;
+	attribute vec2 vertex;
+	attribute vec2 tcoord;
+	varying vec2 ftcoord;
+	varying vec2 fpos;
+#endif
+void main(void)
+{
+	ftcoord = tcoord;
+	fpos = vertex;
+	gl_Position = vec4(2.0*vertex.x/viewSize.x - 1.0, 1.0 - 2.0*vertex.y/viewSize.y, 0, 1);
+};
+)fffuuu";
 
 	static const char* fillFragShader = R"fffuuu(
 #ifdef GL_ES
@@ -559,7 +561,8 @@ static int glnvg__renderCreate(void* uptr)
 
 #ifdef NANOVG_GL3
 #ifdef USE_UNIFORMBUFFER
-	layout(std140) uniform frag {
+	layout(std140) uniform frag
+	{
 		mat3 scissorMat;
 		mat3 paintMat;
 		vec4 innerCol;
@@ -603,7 +606,8 @@ static int glnvg__renderCreate(void* uptr)
 	#define type int(frag[10].w)
 #endif
 
-float sdroundrect(vec2 pt, vec2 ext, float rad) {
+float sdroundrect(vec2 pt, vec2 ext, float rad)
+{
 	vec2 ext2 = ext - vec2(rad,rad);
 	vec2 d = abs(pt) - ext2;
 	return min(max(d.x,d.y),0.0) + length(max(d,0.0)) - rad;

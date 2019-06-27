@@ -52,7 +52,7 @@ void AppWindow::drawScene( float SecsElapsed )
 
 	nvgFontFace( vg, "Consolas" );
 	nvgTextAlign( vg, NVG_ALIGN_TOP | NVG_ALIGN_CENTER );
-	nvgFontSize( vg, 24 );
+	nvgFontSize( vg, 48 );
 	nvgFillColor( vg, nvgRGB( 0, 0, 0 ) );
 	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.5f, "Hello, World", nullptr );
 

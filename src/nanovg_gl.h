@@ -696,8 +696,8 @@ void main(void)
 #else
 		vec4 color = texture2D(tex, ftcoord);
 #endif
-		if( color.x < ( 1.0 / 256.0 ) )
-			discard;
+		// if( color.x < ( 1.0 / 256.0 ) )
+		//	discard;
 		if (texType == 1)
 			color = vec4(color.xyz*color.w,color.w);
 		if (texType == 2)

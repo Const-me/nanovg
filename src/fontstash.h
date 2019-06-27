@@ -152,6 +152,10 @@ void fonsDrawDebug(FONScontext* s, float x, float y);
 #include FT_ADVANCES_H
 #include <math.h>
 
+#ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+#error You must use FreeType build with FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+#endif
+
 struct FONSttFontImpl {
 	FT_Face font;
 };

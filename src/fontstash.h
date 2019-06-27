@@ -18,6 +18,7 @@
 
 #ifndef FONS_H
 #define FONS_H
+#include "FontStash2/Atlas.h"
 
 #define FONS_INVALID -1
 
@@ -325,19 +326,7 @@ struct FONSstate
 };
 typedef struct FONSstate FONSstate;
 
-struct FONSatlasNode {
-    short x, y, width;
-};
-typedef struct FONSatlasNode FONSatlasNode;
-
-struct FONSatlas
-{
-	int width, height;
-	FONSatlasNode* nodes;
-	int nnodes;
-	int cnodes;
-};
-typedef struct FONSatlas FONSatlas;
+typedef FontStash2::Atlas FONSatlas;
 
 struct FONScontext
 {
@@ -429,193 +418,21 @@ static unsigned int fons__decutf8(unsigned int* state, unsigned int* codep, unsi
 	return *state;
 }
 
-// Atlas based on Skyline Bin Packer by Jukka Jylänki
-
-static void fons__deleteAtlas(FONSatlas* atlas)
+static void fons__deleteAtlas( FONSatlas* atlas )
 {
-	if (atlas == NULL) return;
-	if (atlas->nodes != NULL) free(atlas->nodes);
-	free(atlas);
+	delete atlas;
 }
 
-static FONSatlas* fons__allocAtlas(int w, int h, int nnodes)
+static FONSatlas* fons__allocAtlas( int w, int h, int nnodes )
 {
-	FONSatlas* atlas = NULL;
-
-	// Allocate memory for the font stash.
-	atlas = (FONSatlas*)malloc(sizeof(FONSatlas));
-	if (atlas == NULL) goto error;
-	memset(atlas, 0, sizeof(FONSatlas));
-
-	atlas->width = w;
-	atlas->height = h;
-
-	// Allocate space for skyline nodes
-	atlas->nodes = (FONSatlasNode*)malloc(sizeof(FONSatlasNode) * nnodes);
-	if (atlas->nodes == NULL) goto error;
-	memset(atlas->nodes, 0, sizeof(FONSatlasNode) * nnodes);
-	atlas->nnodes = 0;
-	atlas->cnodes = nnodes;
-
-	// Init root node.
-	atlas->nodes[0].x = 0;
-	atlas->nodes[0].y = 0;
-	atlas->nodes[0].width = (short)w;
-	atlas->nnodes++;
-
-	return atlas;
-
-error:
-	if (atlas) fons__deleteAtlas(atlas);
-	return NULL;
-}
-
-static int fons__atlasInsertNode(FONSatlas* atlas, int idx, int x, int y, int w)
-{
-	int i;
-	// Insert node
-	if (atlas->nnodes+1 > atlas->cnodes) {
-		atlas->cnodes = atlas->cnodes == 0 ? 8 : atlas->cnodes * 2;
-		atlas->nodes = (FONSatlasNode*)realloc(atlas->nodes, sizeof(FONSatlasNode) * atlas->cnodes);
-		if (atlas->nodes == NULL)
-			return 0;
-	}
-	for (i = atlas->nnodes; i > idx; i--)
-		atlas->nodes[i] = atlas->nodes[i-1];
-	atlas->nodes[idx].x = (short)x;
-	atlas->nodes[idx].y = (short)y;
-	atlas->nodes[idx].width = (short)w;
-	atlas->nnodes++;
-
-	return 1;
-}
-
-static void fons__atlasRemoveNode(FONSatlas* atlas, int idx)
-{
-	int i;
-	if (atlas->nnodes == 0) return;
-	for (i = idx; i < atlas->nnodes-1; i++)
-		atlas->nodes[i] = atlas->nodes[i+1];
-	atlas->nnodes--;
-}
-
-static void fons__atlasExpand(FONSatlas* atlas, int w, int h)
-{
-	// Insert node for empty space
-	if (w > atlas->width)
-		fons__atlasInsertNode(atlas, atlas->nnodes, atlas->width, 0, w - atlas->width);
-	atlas->width = w;
-	atlas->height = h;
-}
-
-static void fons__atlasReset(FONSatlas* atlas, int w, int h)
-{
-	atlas->width = w;
-	atlas->height = h;
-	atlas->nnodes = 0;
-
-	// Init root node.
-	atlas->nodes[0].x = 0;
-	atlas->nodes[0].y = 0;
-	atlas->nodes[0].width = (short)w;
-	atlas->nnodes++;
-}
-
-static int fons__atlasAddSkylineLevel(FONSatlas* atlas, int idx, int x, int y, int w, int h)
-{
-	int i;
-
-	// Insert new node
-	if (fons__atlasInsertNode(atlas, idx, x, y+h, w) == 0)
-		return 0;
-
-	// Delete skyline segments that fall under the shadow of the new segment.
-	for (i = idx+1; i < atlas->nnodes; i++) {
-		if (atlas->nodes[i].x < atlas->nodes[i-1].x + atlas->nodes[i-1].width) {
-			int shrink = atlas->nodes[i-1].x + atlas->nodes[i-1].width - atlas->nodes[i].x;
-			atlas->nodes[i].x += (short)shrink;
-			atlas->nodes[i].width -= (short)shrink;
-			if (atlas->nodes[i].width <= 0) {
-				fons__atlasRemoveNode(atlas, i);
-				i--;
-			} else {
-				break;
-			}
-		} else {
-			break;
-		}
-	}
-
-	// Merge same height skyline segments that are next to each other.
-	for (i = 0; i < atlas->nnodes-1; i++) {
-		if (atlas->nodes[i].y == atlas->nodes[i+1].y) {
-			atlas->nodes[i].width += atlas->nodes[i+1].width;
-			fons__atlasRemoveNode(atlas, i+1);
-			i--;
-		}
-	}
-
-	return 1;
-}
-
-static int fons__atlasRectFits(FONSatlas* atlas, int i, int w, int h)
-{
-	// Checks if there is enough space at the location of skyline span 'i',
-	// and return the max height of all skyline spans under that at that location,
-	// (think tetris block being dropped at that position). Or -1 if no space found.
-	int x = atlas->nodes[i].x;
-	int y = atlas->nodes[i].y;
-	int spaceLeft;
-	if (x + w > atlas->width)
-		return -1;
-	spaceLeft = w;
-	while (spaceLeft > 0) {
-		if (i == atlas->nnodes) return -1;
-		y = fons__maxi(y, atlas->nodes[i].y);
-		if (y + h > atlas->height) return -1;
-		spaceLeft -= atlas->nodes[i].width;
-		++i;
-	}
-	return y;
-}
-
-static int fons__atlasAddRect(FONSatlas* atlas, int rw, int rh, int* rx, int* ry)
-{
-	int besth = atlas->height, bestw = atlas->width, besti = -1;
-	int bestx = -1, besty = -1, i;
-
-	// Bottom left fit heuristic.
-	for (i = 0; i < atlas->nnodes; i++) {
-		int y = fons__atlasRectFits(atlas, i, rw, rh);
-		if (y != -1) {
-			if (y + rh < besth || (y + rh == besth && atlas->nodes[i].width < bestw)) {
-				besti = i;
-				bestw = atlas->nodes[i].width;
-				besth = y + rh;
-				bestx = atlas->nodes[i].x;
-				besty = y;
-			}
-		}
-	}
-
-	if (besti == -1)
-		return 0;
-
-	// Perform the actual packing.
-	if (fons__atlasAddSkylineLevel(atlas, besti, bestx, besty, rw, rh) == 0)
-		return 0;
-
-	*rx = bestx;
-	*ry = besty;
-
-	return 1;
+	return new FONSatlas( w, h, nnodes );
 }
 
 static void fons__addWhiteRect(FONScontext* stash, int w, int h)
 {
 	int x, y, gx, gy;
 	unsigned char* dst;
-	if (fons__atlasAddRect(stash->atlas, w, h, &gx, &gy) == 0)
+	if( !stash->atlas->addRect( w, h, &gx, &gy ) )
 		return;
 
 	// Rasterize
@@ -1021,14 +838,18 @@ static FONSglyph* fons__getGlyph(FONScontext* stash, FONSfont* font, unsigned in
 	// Determines the spot to draw glyph in the atlas.
 	if (bitmapOption == FONS_GLYPH_BITMAP_REQUIRED) {
 		// Find free spot for the rect in the atlas
-		added = fons__atlasAddRect(stash->atlas, gw, gh, &gx, &gy);
-		if (added == 0 && stash->handleError != NULL) {
+		added = stash->atlas->addRect( gw, gh, &gx, &gy );
+		if (added == 0 && stash->handleError != NULL)
+		{
 			// Atlas is full, let the user to resize the atlas (or not), and try again.
 			stash->handleError(stash->errorUptr, FONS_ATLAS_FULL, 0);
-			added = fons__atlasAddRect(stash->atlas, gw, gh, &gx, &gy);
+			added = stash->atlas->addRect( gw, gh, &gx, &gy );
 		}
-		if (added == 0) return NULL;
-	} else {
+		if (added == 0)
+			return NULL;
+	}
+	else
+	{
 		// Negative coordinate indicates there is no bitmap data created.
 		gx = -1;
 		gy = -1;
@@ -1369,19 +1190,18 @@ void fonsDrawDebug(FONScontext* stash, float x, float y)
 	fons__vertex(stash, x+w, y+h, 1, 1, 0xffffffff);
 
 	// Drawbug draw atlas
-	for (i = 0; i < stash->atlas->nnodes; i++) {
-		FONSatlasNode* n = &stash->atlas->nodes[i];
+	for( const auto& n : stash->atlas->atlasNodes() )
+	{
+		if( stash->nverts + 6 > FONS_VERTEX_COUNT )
+			fons__flush( stash );
 
-		if (stash->nverts+6 > FONS_VERTEX_COUNT)
-			fons__flush(stash);
+		fons__vertex( stash, x + n.x + 0, y + n.y + 0, u, v, 0xc00000ff );
+		fons__vertex( stash, x + n.x + n.width, y + n.y + 1, u, v, 0xc00000ff );
+		fons__vertex( stash, x + n.x + n.width, y + n.y + 0, u, v, 0xc00000ff );
 
-		fons__vertex(stash, x+n->x+0, y+n->y+0, u, v, 0xc00000ff);
-		fons__vertex(stash, x+n->x+n->width, y+n->y+1, u, v, 0xc00000ff);
-		fons__vertex(stash, x+n->x+n->width, y+n->y+0, u, v, 0xc00000ff);
-
-		fons__vertex(stash, x+n->x+0, y+n->y+0, u, v, 0xc00000ff);
-		fons__vertex(stash, x+n->x+0, y+n->y+1, u, v, 0xc00000ff);
-		fons__vertex(stash, x+n->x+n->width, y+n->y+1, u, v, 0xc00000ff);
+		fons__vertex( stash, x + n.x + 0, y + n.y + 0, u, v, 0xc00000ff );
+		fons__vertex( stash, x + n.x + 0, y + n.y + 1, u, v, 0xc00000ff );
+		fons__vertex( stash, x + n.x + n.width, y + n.y + 1, u, v, 0xc00000ff );
 	}
 
 	fons__flush(stash);
@@ -1569,7 +1389,7 @@ void fonsGetAtlasSize(FONScontext* stash, int* width, int* height)
 
 int fonsExpandAtlas(FONScontext* stash, int width, int height)
 {
-	int i, maxy = 0;
+	int i;
 	unsigned char* data = NULL;
 	if (stash == NULL) return 0;
 
@@ -1605,11 +1425,10 @@ int fonsExpandAtlas(FONScontext* stash, int width, int height)
 	stash->texData = data;
 
 	// Increase atlas size
-	fons__atlasExpand(stash->atlas, width, height);
+	stash->atlas->expand( width, height );
 
 	// Add existing data as dirty.
-	for (i = 0; i < stash->atlas->nnodes; i++)
-		maxy = fons__maxi(maxy, stash->atlas->nodes[i].y);
+	const int maxy = stash->atlas->getMaxY();
 	stash->dirtyRect[0] = 0;
 	stash->dirtyRect[1] = 0;
 	stash->dirtyRect[2] = stash->params.width;
@@ -1638,7 +1457,7 @@ int fonsResetAtlas(FONScontext* stash, int width, int height)
 	}
 
 	// Reset atlas
-	fons__atlasReset(stash->atlas, width, height);
+	stash->atlas->reset( width, height );
 
 	// Clear texture data.
 	stash->texData = (unsigned char*)realloc(stash->texData, width * height);

@@ -35,6 +35,9 @@
     <ClInclude Include="..\..\src\FontStash2\Context.h">
       <Filter>FontStash2</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\FontStash2\RamTexture.h">
+      <Filter>FontStash2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="FontStash2">
@@ -59,6 +62,9 @@
       <Filter>FontStash2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\FontStash2\Context.cpp">
+      <Filter>FontStash2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\FontStash2\RamTexture.cpp">
       <Filter>FontStash2</Filter>
     </ClCompile>
   </ItemGroup>

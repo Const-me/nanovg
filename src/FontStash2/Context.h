@@ -1,4 +1,5 @@
 #include "Atlas.h"
+#include "RamTexture.h"
 #include "../fontstash.h"
 
 #ifndef FONS_SCRATCH_BUF_SIZE
@@ -44,8 +45,7 @@ namespace FontStash2
 		FONSparams params;
 		float itw, ith;
 
-		// unsigned char* texData;
-		std::vector<uint8_t> texData;
+		RamTexture<uint8_t> texData;
 		int dirtyRect[ 4 ];
 		std::vector<std::unique_ptr<FontStash2::Font>> fonts;
 		FontStash2::Atlas atlas;

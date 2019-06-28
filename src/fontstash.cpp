@@ -66,28 +66,8 @@ int fonsExpandAtlas( FONScontext* stash, int width, int height )
 			return 0;
 	}
 
-	std::vector<uint8_t> data;
-	try
-	{
-		data.resize( width * height );
-	}
-	catch( std::exception& )
-	{
+	if( !stash->texData.expand( stash->params.width, stash->params.height, width, height ) )
 		return 0;
-	}
-
-	for( int i = 0; i < stash->params.height; i++ )
-	{
-		unsigned char* dst = &data[ i*width ];
-		unsigned char* src = &stash->texData[ i*stash->params.width ];
-		memcpy( dst, src, stash->params.width );
-		if( width > stash->params.width )
-			memset( dst + stash->params.width, 0, width - stash->params.width );
-	}
-	if( height > stash->params.height )
-		memset( &data[ stash->params.height * width ], 0, ( height - stash->params.height ) * width );
-
-	stash->texData.swap( data );
 
 	// Increase atlas size
 	stash->atlas.expand( width, height );
@@ -125,9 +105,9 @@ int fonsResetAtlas( FONScontext* stash, int width, int height )
 	// Reset atlas
 	stash->atlas.reset( width, height );
 
-	// Clear texture data.
-	stash->texData.resize( width * height );
-	memset( stash->texData.data(), 0, width * height );
+	// Clear texture data
+	if( !stash->texData.resize( width, height ) )
+		return 0;
 
 	// Reset dirty rect
 	stash->dirtyRect[ 0 ] = width;

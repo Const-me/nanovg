@@ -1,6 +1,5 @@
 #include <algorithm>
 #include "Context.h"
-#include "blur.h"
 using namespace FontStash2;
 
 Context::Context( FONSparams* p ) :
@@ -21,7 +20,7 @@ bool Context::initStuff()
 	fonts.reserve( FONS_INIT_FONTS );
 
 	// Create texture for the cache
-	texData.resize( params.width * params.height, 0 );
+	texData.resize( params.width, params.height );
 
 	dirtyRect[ 0 ] = params.width;
 	dirtyRect[ 1 ] = params.height;
@@ -39,18 +38,12 @@ bool Context::initStuff()
 
 void Context::addWhiteRect( int w, int h )
 {
-	int x, y, gx, gy;
-	unsigned char* dst;
+	int gx, gy;
 	if( !atlas.addRect( w, h, &gx, &gy ) )
 		return;
 
 	// Rasterize
-	dst = &texData[ gx + gy * params.width ];
-	for( y = 0; y < h; y++ ) {
-		for( x = 0; x < w; x++ )
-			dst[ x ] = 0xff;
-		dst += params.width;
-	}
+	texData.addWhiteRect( params.width, gx, gy, w, h );
 
 	dirtyRect[ 0 ] = std::min( dirtyRect[ 0 ], gx );
 	dirtyRect[ 1 ] = std::min( dirtyRect[ 1 ], gy );
@@ -204,38 +197,13 @@ GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isi
 		return glyph;
 
 	// Rasterize
-	unsigned char* dst = &texData[ ( glyph->x0 + pad ) + ( glyph->y0 + pad ) * params.width ];
-	renderFont->renderGlyphBitmap( dst, gw - pad * 2, gh - pad * 2, params.width );
-
-	// Make sure there is one pixel empty border.
-	dst = &texData[ glyph->x0 + glyph->y0 * params.width ];
-	for( int y = 0; y < gh; y++ )
-	{
-		dst[ y*params.width ] = 0;
-		dst[ gw - 1 + y * params.width ] = 0;
-	}
-	for( int x = 0; x < gw; x++ )
-	{
-		dst[ x ] = 0;
-		dst[ x + ( gh - 1 )*params.width ] = 0;
-	}
-
-	// Debug code to color the glyph background
-/*	unsigned char* fdst = &stash->texData[glyph->x0 + glyph->y0 * stash->params.width];
-	for (y = 0; y < gh; y++) {
-		for (x = 0; x < gw; x++) {
-			int a = (int)fdst[x+y*stash->params.width] + 20;
-			if (a > 255) a = 255;
-			fdst[x+y*stash->params.width] = a;
-		}
-	}*/
+	texData.addGlyph( font, params.width, glyph->x0, glyph->y0, gw, gh, pad );
 
 	// Blur
 	if( iblur > 0 )
 	{
 		scratch.clear();
-		unsigned char* bdst = &texData[ glyph->x0 + glyph->y0 * params.width ];
-		FontStash2::blur( bdst, gw, gh, params.width, iblur );
+		texData.blurRectangle( params.width, glyph->x0, glyph->y0, gw, gh, iblur );
 	}
 
 	dirtyRect[ 0 ] = std::min( dirtyRect[ 0 ], (int)glyph->x0 );

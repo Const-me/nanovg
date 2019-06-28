@@ -49,6 +49,7 @@ namespace FontStash2
 				codepoint( cp ), size( s ), blur( b ) { }
 		};
 
+		// Hasher for the above structure, for std::unordered_map
 		struct GlyphKeyHash
 		{
 			std::size_t operator()( const GlyphKey& k ) const
@@ -61,6 +62,10 @@ namespace FontStash2
 			}
 		};
 
+		// The main hash map which maps (codepoint, size, blur) tuples into GlyphValue structures.
+		// Using PlexAlloc from https://github.com/Const-me/CollectionMicrobench to reduce RAM allocations and make it more cache friendly.
+		// Original C code used a fixed size hash map with 256 buckets, with linked list for every bucket, and elements stored in a single vector.
+		// Original is probably slightly faster for small atlases with ~64 glyphs, but this one scales much better.
 		using TAlloc = PlexAlloc::Allocator<std::pair<const GlyphKey, GlyphValue>, 256>;
 		using TGlyphsMap = std::unordered_map<GlyphKey, GlyphValue, GlyphKeyHash, std::equal_to<GlyphKey>, TAlloc>;
 		TGlyphsMap glyphs;

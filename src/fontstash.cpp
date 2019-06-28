@@ -145,7 +145,7 @@ void fonsSetErrorCallback( FONScontext* stash, void( *callback )( void* uptr, in
 // ===== Atlas =====
 void fonsGetAtlasSize( FONScontext* stash, int* width, int* height )
 {
-	if( stash == NULL )
+	if( nullptr == stash )
 		return;
 	*width = stash->params.width;
 	*height = stash->params.height;
@@ -153,7 +153,7 @@ void fonsGetAtlasSize( FONScontext* stash, int* width, int* height )
 
 int fonsExpandAtlas( FONScontext* stash, int width, int height )
 {
-	if( stash == NULL )
+	if( nullptr == stash )
 		return 0;
 
 	width = fons__maxi( width, stash->params.width );
@@ -214,7 +214,8 @@ int fonsExpandAtlas( FONScontext* stash, int width, int height )
 
 int fonsResetAtlas( FONScontext* stash, int width, int height )
 {
-	if( stash == NULL ) return 0;
+	if( nullptr == stash )
+		return 0;
 
 	// Flush pending glyphs.
 	stash->flush();
@@ -284,6 +285,9 @@ int fonsAddFont( FONScontext* stash, const char* name, const char* path )
 
 int fonsAddFontMem( FONScontext* stash, const char* name, unsigned char* data, int dataSize, int freeData )
 {
+	if( nullptr == stash )
+		return FONS_INVALID;
+
 	std::vector<uint8_t> dataVector{ data, data + dataSize };
 	if( freeData )
 		free( data );
@@ -293,6 +297,9 @@ int fonsAddFontMem( FONScontext* stash, const char* name, unsigned char* data, i
 
 int fonsGetFontByName( FONScontext* s, const char* name )
 {
+	if( nullptr == s )
+		return FONS_INVALID;
+
 	const int count = (int)s->fonts.size();
 	for( int i = 0; i < count; i++ )
 		if( s->fonts[ i ]->hasName( name ) )
@@ -325,37 +332,51 @@ void fonsClearState( FONScontext* s )
 // ===== State setting =====
 void fonsSetSize( FONScontext* stash, float size )
 {
+	if( nullptr == stash )
+		return;
 	stash->getState()->size = size;
 }
 
 void fonsSetColor( FONScontext* stash, unsigned int color )
 {
+	if( nullptr == stash )
+		return;
 	stash->getState()->color = color;
 }
 
 void fonsSetSpacing( FONScontext* stash, float spacing )
 {
+	if( nullptr == stash )
+		return;
 	stash->getState()->spacing = spacing;
 }
 
 void fonsSetBlur( FONScontext* stash, float blur )
 {
+	if( nullptr == stash )
+		return;
 	stash->getState()->blur = blur;
 }
 
 void fonsSetAlign( FONScontext* stash, int align )
 {
+	if( nullptr == stash )
+		return;
 	stash->getState()->align = align;
 }
 
 void fonsSetFont( FONScontext* stash, int font )
 {
+	if( nullptr == stash )
+		return;
 	stash->getState()->font = font;
 }
 
 // ===== Draw text =====
 float fonsDrawText( FONScontext* stash, float x, float y, const char* str, const char* end )
 {
+	if( nullptr == stash )
+		return 0;
 	FONSstate* state = stash->getState();
 	unsigned int codepoint;
 	unsigned int utf8state = 0;
@@ -424,6 +445,9 @@ float fonsDrawText( FONScontext* stash, float x, float y, const char* str, const
 // ===== Measure text =====
 float fonsTextBounds( FONScontext* stash, float x, float y, const char* str, const char* end, float* bounds )
 {
+	if( nullptr == stash )
+		return 0;
+
 	FONSstate* state = stash->getState();
 	unsigned int codepoint;
 	unsigned int utf8state = 0;
@@ -503,10 +527,9 @@ float fonsTextBounds( FONScontext* stash, float x, float y, const char* str, con
 
 void fonsLineBounds( FONScontext* stash, float y, float* miny, float* maxy )
 {
-	FONSstate* const state = stash->getState();
-
-	if( stash == NULL )
+	if( nullptr == stash )
 		return;
+	FONSstate* const state = stash->getState();
 	if( state->font < 0 || state->font >= stash->fonts.size() )
 		return;
 	FONSfont &font = *stash->fonts[ state->font ];
@@ -518,6 +541,8 @@ void fonsLineBounds( FONScontext* stash, float y, float* miny, float* maxy )
 
 void fonsVertMetrics( FONScontext* stash, float* ascender, float* descender, float* lineh )
 {
+	if( nullptr == stash )
+		return;
 	FONSstate* state = stash->getState();
 	if( stash == NULL ) return;
 	if( state->font < 0 || state->font >= stash->fonts.size() )
@@ -533,6 +558,9 @@ void fonsVertMetrics( FONScontext* stash, float* ascender, float* descender, flo
 int fonsTextIterInit( FONScontext* stash, FONStextIter* iter,
 	float x, float y, const char* str, const char* end, int bitmapOption )
 {
+	if( nullptr == stash )
+		return 0;
+
 	FONSstate* state = stash->getState();
 	float width;
 

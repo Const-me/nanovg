@@ -30,6 +30,7 @@
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\MemAlloc.hpp" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Plex.hpp" />
     <ClInclude Include="..\..\src\FontStash2\RamTexture.h" />
+    <ClInclude Include="..\..\src\FontStash2\truevision.h" />
     <ClInclude Include="..\..\src\FontStash2\utf8.h" />
     <ClInclude Include="..\..\src\nanovg.h" />
     <ClInclude Include="..\..\src\nanovg_gl.h" />
@@ -45,6 +46,7 @@
     <ClCompile Include="..\..\src\FontStash2\Context.dbg.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Font.cpp" />
     <ClCompile Include="..\..\src\FontStash2\RamTexture.cpp" />
+    <ClCompile Include="..\..\src\FontStash2\truevision.cpp" />
     <ClCompile Include="..\..\src\FontStash2\utf8.cpp" />
     <ClCompile Include="..\..\src\nanovg.cpp" />
   </ItemGroup>

@@ -7,6 +7,7 @@ namespace FontStash2
 	class Font;
 	struct GlyphValue;
 
+	// A 2D texture in system RAM
 	template<class T>
 	class RamTexture
 	{

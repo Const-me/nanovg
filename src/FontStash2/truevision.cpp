@@ -129,7 +129,7 @@ namespace Truevision
 			return false;
 		if( !file.write( header ) )
 			return false;
-		if( !file.write( rgb24.data(), w * h * 3 ) )
+		if( !file.write( rgb24.data(), rgb24.size() ) )
 			return false;
 		return true;
 	}

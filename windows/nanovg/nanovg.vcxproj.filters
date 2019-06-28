@@ -67,5 +67,8 @@
     <ClCompile Include="..\..\src\FontStash2\RamTexture.cpp">
       <Filter>FontStash2</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\FontStash2\Context.dbg.cpp">
+      <Filter>FontStash2</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

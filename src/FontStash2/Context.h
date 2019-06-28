@@ -90,5 +90,7 @@ namespace FontStash2
 		void clearState();
 
 		int addFont( const char* name, std::vector<uint8_t>& data );
+
+		int debugDumpAtlas( const char* grayscale, const char* cleartype ) const;
 	};
 }

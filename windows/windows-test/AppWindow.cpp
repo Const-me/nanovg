@@ -57,4 +57,11 @@ void AppWindow::drawScene( float SecsElapsed )
 	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.5f, "Hello, World", nullptr );
 
 	nvgEndFrame( vg );
+
+	static bool s_bFirst = true;
+	if( s_bFirst )
+	{
+		s_bFirst = false;
+		nvgDebugDumpFontAtlas( vg, R"(C:\Temp\2remove\VG\gray.tga)", R"(C:\Temp\2remove\VG\cleartype.tga)" );
+	}
 }

@@ -2930,4 +2930,11 @@ void nvgTextMetrics( NVGcontext* ctx, float* ascender, float* descender, float* 
 	if( lineh != NULL )
 		*lineh *= invscale;
 }
+
+int nvgDebugDumpFontAtlas( NVGcontext* ctx, const char* grayscale, const char* cleartype )
+{
+	if( nullptr == ctx || nullptr == ctx->fs )
+		return 0;
+	return fonsDebugDumpAtlas( ctx->fs, grayscale, cleartype );
+}
 // vim: ft=c nu noet ts=4

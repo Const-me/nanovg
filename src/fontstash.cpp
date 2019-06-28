@@ -594,3 +594,8 @@ int fonsAddFallbackFont( FONScontext* stash, int base, int fallback )
 	FONSfont* baseFont = stash->fonts[ base ].get();
 	return baseFont->tryAddFallback( fallback );
 }
+
+int fonsDebugDumpAtlas( FONScontext* stash, const char* grayscale, const char* cleartype )
+{
+	return stash->debugDumpAtlas( grayscale, cleartype );
+}

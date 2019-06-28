@@ -111,3 +111,5 @@ int fonsValidateTexture( FONScontext* s, int* dirty );
 void fonsDrawDebug( FONScontext* s, float x, float y );
 
 int fonsAddFallbackFont( FONScontext* stash, int base, int fallback );
+
+int fonsDebugDumpAtlas( FONScontext* stash, const char* grayscale, const char* cleartype );

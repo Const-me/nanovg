@@ -23,6 +23,7 @@
     <ClInclude Include="..\..\src\fontstash.h" />
     <ClInclude Include="..\..\src\FontStash2\Atlas.h" />
     <ClInclude Include="..\..\src\FontStash2\blur.h" />
+    <ClInclude Include="..\..\src\FontStash2\Context.h" />
     <ClInclude Include="..\..\src\FontStash2\Font.h" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Allocator.hpp" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\FreeList.hpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="..\..\src\fontstash.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Atlas.cpp" />
     <ClCompile Include="..\..\src\FontStash2\blur.cpp" />
+    <ClCompile Include="..\..\src\FontStash2\Context.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Font.cpp" />
     <ClCompile Include="..\..\src\FontStash2\utf8.cpp" />
     <ClCompile Include="..\..\src\nanovg.cpp" />

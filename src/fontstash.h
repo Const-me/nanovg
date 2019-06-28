@@ -24,7 +24,8 @@ using FONSfont = FontStash2::Font;
 
 #define FONS_INVALID -1
 
-struct FONSparams {
+struct FONSparams
+{
 	int width, height;
 	unsigned char flags;
 	void* userPtr;
@@ -55,7 +56,11 @@ struct FONStextIter
 	int bitmapOption;
 };
 
-class FONScontext;
+namespace FontStash2
+{
+	class Context;
+}
+using FONScontext = FontStash2::Context;
 
 // Constructor and destructor.
 FONScontext* fonsCreateInternal( FONSparams* params );

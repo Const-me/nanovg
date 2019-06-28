@@ -4,8 +4,7 @@
 #include "PlexAlloc/Allocator.hpp"
 #include <unordered_map>
 
-// We don't need to include FreeType here. Forward declarations are enough, reduce compilation time.
-typedef struct FT_LibraryRec_ *FT_Library;
+// We don't need to include FreeType here. Forward declaration is enough, reduce compilation time.
 typedef struct FT_FaceRec_* FT_Face;
 
 namespace FontStash2
@@ -66,6 +65,7 @@ namespace FontStash2
 		using TGlyphsMap = std::unordered_map<GlyphKey, GlyphValue, GlyphKeyHash, std::equal_to<GlyphKey>, TAlloc>;
 		TGlyphsMap glyphs;
 
+		// Indices of fall back fonts
 		std::vector<int> fallbacks;
 
 		void clear();

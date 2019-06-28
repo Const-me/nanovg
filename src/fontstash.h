@@ -17,7 +17,6 @@
 //
 
 #pragma once
-#include "FontStash2/Atlas.h"
 #include "FontStash2/Font.h"
 #include "fontstash.enums.h"
 
@@ -56,7 +55,7 @@ struct FONStextIter
 	int bitmapOption;
 };
 
-struct FONScontext;
+class FONScontext;
 
 // Constructor and destructor.
 FONScontext* fonsCreateInternal( FONSparams* params );

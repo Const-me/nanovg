@@ -25,6 +25,7 @@ namespace FontStash2
 	{
 		FT_Face font = nullptr;
 		char name[ 64 ];
+		// Source data, i.e. .TTF file in RAM. Apparently, FreeType2 library doesn't copy it to internal structures.
 		std::vector<uint8_t> data;
 
 		// Values from font->ascender/descender, scaled relatively to line height 

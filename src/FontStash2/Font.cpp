@@ -36,14 +36,13 @@ namespace FontStash2
 
 using namespace FontStash2;
 
-Font::Font( int maxFallbacks )
-{
-	fallbacks.reserve( maxFallbacks );
-}
+Font::Font( int maxFallbacks ):
+	maxFallbackFonts( maxFallbacks )
+{ }
 
 bool Font::tryAddFallback( int i )
 {
-	if( fallbacks.size() < fallbacks.capacity() )
+	if( (int)fallbacks.size() < maxFallbackFonts )
 	{
 		fallbacks.push_back( i );
 		return true;

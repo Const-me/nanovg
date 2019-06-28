@@ -71,6 +71,7 @@ namespace FontStash2
 		TGlyphsMap glyphs;
 
 		// Indices of fall back fonts
+		const int maxFallbackFonts;
 		std::vector<int> fallbacks;
 
 		void clear();

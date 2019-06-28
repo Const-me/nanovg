@@ -28,7 +28,7 @@ namespace FontStash2
 			{
 				return false;
 			}
-			memset( texture.data(), 0, width * height * sizeof( T ) );
+			std::fill( texture.begin(), texture.end(), 0 );
 			return true;
 		}
 

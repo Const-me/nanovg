@@ -28,4 +28,5 @@ private:
 	float pxRatio;
 	Vector2 windowSize;
 	int consolasFont;
+	bool bResized = true;
 };

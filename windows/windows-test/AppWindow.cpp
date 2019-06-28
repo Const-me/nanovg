@@ -41,6 +41,7 @@ void AppWindow::initScene( CSize viewportSize )
 	windowSize.y = (float)viewportSize.cy;
 	pxRatio = windowSize.x / windowSize.y;
 	glViewport( 0, 0, viewportSize.cx, viewportSize.cy );
+	bResized = true;
 }
 
 void AppWindow::drawScene( float SecsElapsed )
@@ -58,10 +59,9 @@ void AppWindow::drawScene( float SecsElapsed )
 
 	nvgEndFrame( vg );
 
-	static bool s_bFirst = true;
-	if( s_bFirst )
+	if( bResized )
 	{
-		s_bFirst = false;
+		bResized = false;
 		nvgDebugDumpFontAtlas( vg, R"(C:\Temp\2remove\VG\gray.tga)", R"(C:\Temp\2remove\VG\cleartype.tga)" );
 	}
 }

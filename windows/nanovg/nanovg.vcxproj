@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\src\FontStash2\blur.h" />
     <ClInclude Include="..\..\src\FontStash2\Context.h" />
     <ClInclude Include="..\..\src\FontStash2\Font.h" />
+    <ClInclude Include="..\..\src\FontStash2\logger.h" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Allocator.hpp" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\FreeList.hpp" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\MemAlloc.hpp" />

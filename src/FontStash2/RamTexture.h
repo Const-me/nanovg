@@ -5,6 +5,7 @@
 namespace FontStash2
 {
 	class Font;
+	struct GlyphValue;
 
 	template<class T>
 	class RamTexture
@@ -71,7 +72,8 @@ namespace FontStash2
 			}
 		}
 
-		void addGlyph( Font& font, int textureWidth, int x, int y, int w, int h, int pad );
+		bool addGlyph( Font& font, int textureWidth, const GlyphValue* glyph, int pad );
+		bool addCleartypeGlyph( Font& font, float size, int textureWidth, const GlyphValue* glyph, int pad );
 
 		void blurRectangle( int textureWidth, int x, int y, int w, int h, short iblur );
 	};

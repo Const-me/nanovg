@@ -21,6 +21,7 @@ bool Context::initStuff()
 
 	// Create texture for the cache
 	texData.resize( params.width, params.height );
+	cleartypeTexture.resize( params.width, params.height );
 
 	dirtyRect[ 0 ] = params.width;
 	dirtyRect[ 1 ] = params.height;
@@ -44,6 +45,7 @@ void Context::addWhiteRect( int w, int h )
 
 	// Rasterize
 	texData.addWhiteRect( params.width, gx, gy, w, h );
+	cleartypeTexture.addWhiteRect( params.width, gx, gy, w, h );
 
 	dirtyRect[ 0 ] = std::min( dirtyRect[ 0 ], gx );
 	dirtyRect[ 1 ] = std::min( dirtyRect[ 1 ], gy );
@@ -116,13 +118,13 @@ int Context::addFont( const char* name, std::vector<uint8_t>& data )
 
 GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isize, short iblur, int bitmapOption )
 {
-	float size = isize / 10.0f;
+	const float size = isize / 10.0f;
 	FONSfont* renderFont = &font;
 
 	if( isize < 2 )
 		return NULL;
 	if( iblur > 20 ) iblur = 20;
-	int pad = iblur + 2;
+	const int pad = iblur + 2;
 
 	// Reset allocator.
 	scratch.clear();
@@ -134,7 +136,7 @@ GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isi
 			return glyph;
 
 	// Create a new glyph or rasterize bitmap data for a cached glyph.
-	int g = font.getGlyphIndex( codepoint );
+	uint32_t g = font.getGlyphIndex( codepoint );
 	// Try to find the glyph in fallback fonts.
 	if( g == 0 )
 	{
@@ -154,7 +156,7 @@ GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isi
 	}
 	const float scale = renderFont->getPixelHeightScale( size );
 	int advance, lsb, x0, y0, x1, y1;
-	renderFont->buildGlyphBitmap( g, size, scale, &advance, &lsb, &x0, &y0, &x1, &y1 );
+	renderFont->buildGlyphBitmap( g, size, &advance, &lsb, &x0, &y0, &x1, &y1 );
 	const int gw = x1 - x0 + pad * 2;
 	const int gh = y1 - y0 + pad * 2;
 
@@ -197,7 +199,8 @@ GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isi
 		return glyph;
 
 	// Rasterize
-	texData.addGlyph( font, params.width, glyph->x0, glyph->y0, gw, gh, pad );
+	texData.addGlyph( font, params.width, glyph, pad );
+	cleartypeTexture.addCleartypeGlyph( font, size, params.width, glyph, pad );
 
 	// Blur
 	if( iblur > 0 )

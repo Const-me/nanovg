@@ -68,6 +68,8 @@ int fonsExpandAtlas( FONScontext* stash, int width, int height )
 
 	if( !stash->texData.expand( stash->params.width, stash->params.height, width, height ) )
 		return 0;
+	if( !stash->cleartypeTexture.expand( stash->params.width, stash->params.height, width, height ) )
+		return 0;
 
 	// Increase atlas size
 	stash->atlas.expand( width, height );
@@ -107,6 +109,8 @@ int fonsResetAtlas( FONScontext* stash, int width, int height )
 
 	// Clear texture data
 	if( !stash->texData.resize( width, height ) )
+		return 0;
+	if( !stash->cleartypeTexture.resize( width, height ) )
 		return 0;
 
 	// Reset dirty rect

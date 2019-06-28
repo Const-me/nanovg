@@ -34,3 +34,5 @@ using DirectX::SimpleMath::Matrix;
 #include "Utils/Assert.h"
 #include "Utils/MiscUtils.h"
 #include <stdio.h>
+
+#define NANOVG_CLEARTYPE

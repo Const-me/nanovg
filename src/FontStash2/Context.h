@@ -48,6 +48,7 @@ namespace FontStash2
 		float itw, ith;
 
 		RamTexture<uint8_t> texData;
+		RamTexture<uint32_t> cleartypeTexture;
 		int dirtyRect[ 4 ];
 		std::vector<std::unique_ptr<FontStash2::Font>> fonts;
 		FontStash2::Atlas atlas;

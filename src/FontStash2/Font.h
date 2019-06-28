@@ -11,7 +11,7 @@ namespace FontStash2
 {
 	struct GlyphValue
 	{
-		int index;
+		uint32_t index;
 		short x0, y0, x1, y1;
 		short xadv, xoff, yoff;
 
@@ -87,7 +87,7 @@ namespace FontStash2
 		// Load FreeType font
 		bool initialize( const char* name, std::vector<uint8_t>& buffer );
 
-		// Add index of a fallback font
+		// Add index of a fall back font
 		bool tryAddFallback( int i );
 
 		// True if the argument is equal to the string in this->name
@@ -110,19 +110,22 @@ namespace FontStash2
 
 		void reset();
 
-		int getGlyphIndex( unsigned int codepoint ) const;
+		uint32_t getGlyphIndex( unsigned int codepoint ) const;
 
 		const std::vector<int> &getFallbackFonts() const
 		{
 			return fallbacks;
 		}
 
-		bool buildGlyphBitmap( int glyph, float size, float scale,
-			int *advance, int *lsb, int *x0, int *y0, int *x1, int *y1 ) const;
+		bool buildGlyphBitmap( int glyph, float size, int *advance, int *lsb, int *x0, int *y0, int *x1, int *y1 ) const;
 
 		GlyphValue* allocGlyph( unsigned int codepoint, short isize, short blur );
 
 		void renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight, int outStride ) const;
+
+#ifdef NANOVG_CLEARTYPE
+		bool renderCleartypeBitmap( const GlyphValue* glyph, float size, uint32_t *output, int outWidth, int outHeight, int outStride ) const;
+#endif
 
 		float getVertAlign( bool zeroTopLeft, int align, short isize ) const;
 

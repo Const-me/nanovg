@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "Font.h"
 #include "../fontstash.enums.h"
 
@@ -32,11 +33,14 @@ namespace FontStash2
 		ftLibrary = nullptr;
 		return ftError == 0;
 	}
+
+	constexpr FT_Int32 loadFlagsNormal = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
+	constexpr FT_Int32 loadFlagsClearType = loadFlagsNormal | FT_LOAD_TARGET_LCD;
 }
 
 using namespace FontStash2;
 
-Font::Font( int maxFallbacks ):
+Font::Font( int maxFallbacks ) :
 	maxFallbackFonts( maxFallbacks )
 { }
 
@@ -118,25 +122,22 @@ float Font::getPixelHeightScale( float size ) const
 	return size / ( font->ascender - font->descender );
 }
 
-int Font::getGlyphIndex( unsigned int codepoint ) const
+uint32_t Font::getGlyphIndex( unsigned int codepoint ) const
 {
 	return FT_Get_Char_Index( font, codepoint );
 }
 
-bool Font::buildGlyphBitmap( int glyph, float size, float scale,
-	int *advance, int *lsb, int *x0, int *y0, int *x1, int *y1 ) const
+bool Font::buildGlyphBitmap( int glyph, float size, int *advance, int *lsb, int *x0, int *y0, int *x1, int *y1 ) const
 {
-	FT_Error ftError;
-	FT_GlyphSlot ftGlyph;
-	FT_Fixed advFixed;
+	FT_Error ftError = FT_Set_Pixel_Sizes( font, 0, (FT_UInt)( size * (float)font->units_per_EM / (float)( font->ascender - font->descender ) ) );
+	if( ftError ) return false;
+	ftError = FT_Load_Glyph( font, glyph, loadFlagsNormal );
+	if( ftError ) return false;
 
-	ftError = FT_Set_Pixel_Sizes( font, 0, (FT_UInt)( size * (float)font->units_per_EM / (float)( font->ascender - font->descender ) ) );
-	if( ftError ) return false;
-	ftError = FT_Load_Glyph( font, glyph, FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT );
-	if( ftError ) return false;
+	FT_Fixed advFixed;
 	ftError = FT_Get_Advance( font, glyph, FT_LOAD_NO_SCALE, &advFixed );
 	if( ftError ) return false;
-	ftGlyph = font->glyph;
+	FT_GlyphSlot ftGlyph = font->glyph;
 	*advance = (int)advFixed;
 	*lsb = (int)ftGlyph->metrics.horiBearingX;
 	*x0 = ftGlyph->bitmap_left;
@@ -156,10 +157,78 @@ void Font::renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight
 {
 	FT_GlyphSlot ftGlyph = font->glyph;
 	int ftGlyphOffset = 0;
+
+	const uint8_t* sourceBuffer = ftGlyph->bitmap.buffer;
 	for( uint32_t y = 0; y < ftGlyph->bitmap.rows; y++ )
 		for( uint32_t x = 0; x < ftGlyph->bitmap.width; x++ )
-			output[ ( y * outStride ) + x ] = ftGlyph->bitmap.buffer[ ftGlyphOffset++ ];
+		{
+			output[ ( y * outStride ) + x ] = *sourceBuffer;
+			sourceBuffer++;
+		}
 }
+
+#ifdef NANOVG_CLEARTYPE
+// Pack 3 grayscale sub-pixel bytes into a single RGBA pixel
+inline uint32_t packCleartypeSubpixels( const uint8_t* triple )
+{
+	uint32_t res = triple[ 0 ];
+	res |= ( ( (uint32_t)triple[ 1 ] ) << 8 );
+	res |= ( ( (uint32_t)triple[ 2 ] ) << 16 );
+	// On PC GPUs, it's much faster to do in pixel shader. On slow embedded ARM this is probably not the case.
+	// Ideally we might want max, not bitwise OR, but OR is much faster to compute in scalar code.
+	// This code only runs while building textures, i.e. much less frequent than each frame.
+	const uint32_t all = triple[ 0 ] | triple[ 1 ] | triple[ 2 ];
+	res |= ( all << 24 );
+	return res;
+}
+
+inline void copyCleartypeGlyph( FT_GlyphSlot ftGlyph, uint32_t *output, int outStride, int rgbWidth )
+{
+	const uint8_t* sourceBuffer = ftGlyph->bitmap.buffer;
+	for( uint32_t y = 0; y < ftGlyph->bitmap.rows; y++ )
+		for( int x = 0; x < rgbWidth; x++ )
+		{
+			output[ ( y * outStride ) + x ] = packCleartypeSubpixels( sourceBuffer );
+			sourceBuffer += 3;
+		}
+}
+
+bool Font::renderCleartypeBitmap( const GlyphValue* glyph, float size, uint32_t *output, int outWidth, int outHeight, int outStride ) const
+{
+	FT_Error ftError = FT_Set_Pixel_Sizes( font, 0, (FT_UInt)( size * (float)font->units_per_EM / (float)( font->ascender - font->descender ) ) );
+	if( ftError ) return false;
+
+	ftError = FT_Load_Glyph( font, glyph->index, loadFlagsClearType );
+	if( ftError )
+		return false;
+
+	FT_GlyphSlot ftGlyph = font->glyph;
+	assert( ftGlyph->bitmap.rows == outHeight );
+
+	// assert( ftGlyph->bitmap.width == outWidth * 3 );
+	// ClearType bitmap width slightly difffers from outWidth * 3.
+	assert( 0 == ( ftGlyph->bitmap.width % 3 ) );
+	const int rgbWidth = ftGlyph->bitmap.width / 3;
+
+	if( rgbWidth <= outWidth )
+	{
+		// Copy everything, to the same positions.
+		copyCleartypeGlyph( ftGlyph, output, outStride, rgbWidth );
+		return true;
+	}
+
+	if( rgbWidth <= outWidth + 4 )
+	{
+		// We have at least 2 pixels padding, use that space
+		output -= ( rgbWidth - outWidth ) / 2;
+		copyCleartypeGlyph( ftGlyph, output, outStride, rgbWidth );
+		return true;
+	}
+
+	assert( false );
+	return false;
+}
+#endif
 
 float Font::getVertAlign( bool zeroTopLeft, int align, short isize ) const
 {
@@ -203,11 +272,11 @@ void Font::fonsLineBounds( bool zeroTopLeft, short isize, float y, float* miny, 
 	if( zeroTopLeft )
 	{
 		*miny = y - ascender * (float)isize / 10.0f;
-		*maxy = *miny + lineh*isize / 10.0f;
+		*maxy = *miny + lineh * isize / 10.0f;
 	}
 	else
 	{
 		*maxy = y + descender * (float)isize / 10.0f;
-		*miny = *maxy - lineh*isize / 10.0f;
+		*miny = *maxy - lineh * isize / 10.0f;
 	}
 }

@@ -30,8 +30,6 @@ extern "C" {
 #pragma warning(disable: 4201)  // nonstandard extension used : nameless struct/union
 #endif
 
-#define NANOVG_CLEARTYPE
-
 typedef struct NVGcontext NVGcontext;
 
 struct NVGcolor {

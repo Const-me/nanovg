@@ -6,8 +6,10 @@
 #include FT_ADVANCES_H
 #include <math.h>
 
+#ifdef NANOVG_CLEARTYPE
 #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 #error You must use FreeType build with FT_CONFIG_OPTION_SUBPIXEL_RENDERING
+#endif
 #endif
 
 namespace FontStash2

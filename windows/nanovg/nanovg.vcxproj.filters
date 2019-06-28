@@ -26,6 +26,9 @@
       <Filter>FontStash2\PlexAlloc</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\fontstash.enums.h" />
+    <ClInclude Include="..\..\src\FontStash2\utf8.h">
+      <Filter>FontStash2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="FontStash2">
@@ -43,5 +46,8 @@
       <Filter>FontStash2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\fontstash.cpp" />
+    <ClCompile Include="..\..\src\FontStash2\utf8.cpp">
+      <Filter>FontStash2</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

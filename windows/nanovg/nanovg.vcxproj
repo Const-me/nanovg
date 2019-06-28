@@ -27,6 +27,7 @@
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\FreeList.hpp" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\MemAlloc.hpp" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Plex.hpp" />
+    <ClInclude Include="..\..\src\FontStash2\utf8.h" />
     <ClInclude Include="..\..\src\nanovg.h" />
     <ClInclude Include="..\..\src\nanovg_gl.h" />
     <ClInclude Include="..\..\src\nanovg_gl_utils.h" />
@@ -37,6 +38,7 @@
     <ClCompile Include="..\..\src\fontstash.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Atlas.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Font.cpp" />
+    <ClCompile Include="..\..\src\FontStash2\utf8.cpp" />
     <ClCompile Include="..\..\src\nanovg.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

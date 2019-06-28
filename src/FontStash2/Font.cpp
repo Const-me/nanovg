@@ -156,26 +156,29 @@ GlyphValue* Font::allocGlyph( unsigned int codepoint, short isize, short blur )
 void Font::renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight, int outStride ) const
 {
 	FT_GlyphSlot ftGlyph = font->glyph;
-	int ftGlyphOffset = 0;
+	const uint8_t* sourceLine = ftGlyph->bitmap.buffer;	// Read pointer
+	const size_t sourceStride = ftGlyph->bitmap.pitch;	// Bytes to skip between source lines
+	const size_t lineWidth = ftGlyph->bitmap.width;	// Bytes to copy per each line
+	const uint32_t height = ftGlyph->bitmap.rows;	// Rows to copy
 
-	const uint8_t* sourceBuffer = ftGlyph->bitmap.buffer;
-	for( uint32_t y = 0; y < ftGlyph->bitmap.rows; y++ )
-		for( uint32_t x = 0; x < ftGlyph->bitmap.width; x++ )
-		{
-			output[ ( y * outStride ) + x ] = *sourceBuffer;
-			sourceBuffer++;
-		}
+	for( uint32_t y = 0; y < height; y++ )
+	{
+		std::copy_n( sourceLine, lineWidth, output );
+		sourceLine += sourceStride;
+		output += outStride;
+	}
 }
 
 #ifdef NANOVG_CLEARTYPE
-// Pack 3 grayscale sub-pixel bytes into a single RGBA pixel
+
+// Pack 3 grayscale sub-pixel bytes into a single RGBA pixel.
 inline uint32_t packCleartypeSubpixels( const uint8_t* triple )
 {
 	uint32_t res = triple[ 0 ];
 	res |= ( ( (uint32_t)triple[ 1 ] ) << 8 );
 	res |= ( ( (uint32_t)triple[ 2 ] ) << 16 );
 	// On PC GPUs, it's much faster to do in pixel shader. On slow embedded ARM this is probably not the case.
-	// Ideally we might want max, not bitwise OR, but OR is much faster to compute in scalar code.
+	// Ideally we might want max, not bitwise OR, but OR is much faster to compute in scalar code, too bad scalar parts of CPUs don't have instructions like pmaxub (PC) / umax (ARM).
 	// This code only runs while building textures, i.e. much less frequent than each frame.
 	const uint32_t all = triple[ 0 ] | triple[ 1 ] | triple[ 2 ];
 	res |= ( all << 24 );
@@ -184,13 +187,21 @@ inline uint32_t packCleartypeSubpixels( const uint8_t* triple )
 
 inline void copyCleartypeGlyph( FT_GlyphSlot ftGlyph, uint32_t *output, int outStride, int rgbWidth )
 {
-	const uint8_t* sourceBuffer = ftGlyph->bitmap.buffer;
+	const uint8_t* sourceLine = ftGlyph->bitmap.buffer;
+	const size_t sourceStride = ftGlyph->bitmap.pitch;
 	for( uint32_t y = 0; y < ftGlyph->bitmap.rows; y++ )
+	{
+		const uint8_t* src = sourceLine;
+		uint32_t *dest = output;
 		for( int x = 0; x < rgbWidth; x++ )
 		{
-			output[ ( y * outStride ) + x ] = packCleartypeSubpixels( sourceBuffer );
-			sourceBuffer += 3;
+			*dest = packCleartypeSubpixels( src );
+			src += 3;
+			dest++;
 		}
+		sourceLine += sourceStride;
+		output += outStride;
+	}
 }
 
 bool Font::renderCleartypeBitmap( const GlyphValue* glyph, float size, uint32_t *output, int outWidth, int outHeight, int outStride ) const

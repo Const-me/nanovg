@@ -1,4 +1,6 @@
+#include <memory>
 #include "Atlas.h"
+#include "Font.h"
 #include "RamTexture.h"
 #include "../fontstash.h"
 

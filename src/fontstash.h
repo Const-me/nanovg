@@ -17,9 +17,14 @@
 //
 
 #pragma once
-#include "FontStash2/Font.h"
 #include "fontstash.enums.h"
 
+namespace FontStash2
+{
+	class Context;
+	class Font;
+}
+using FONScontext = FontStash2::Context;
 using FONSfont = FontStash2::Font;
 
 #define FONS_INVALID -1
@@ -56,22 +61,16 @@ struct FONStextIter
 	int bitmapOption;
 };
 
-namespace FontStash2
-{
-	class Context;
-}
-using FONScontext = FontStash2::Context;
-
-// Constructor and destructor.
+// Constructor and destructor
 FONScontext* fonsCreateInternal( FONSparams* params );
 void fonsDeleteInternal( FONScontext* s );
 
 void fonsSetErrorCallback( FONScontext* s, void( *callback )( void* uptr, int error, int val ), void* uptr );
-// Returns current atlas size.
+// Returns current atlas size
 void fonsGetAtlasSize( FONScontext* s, int* width, int* height );
-// Expands the atlas size.
+// Expands the atlas size
 int fonsExpandAtlas( FONScontext* s, int width, int height );
-// Resets the whole stash.
+// Resets the whole stash
 int fonsResetAtlas( FONScontext* stash, int width, int height );
 
 // Add fonts

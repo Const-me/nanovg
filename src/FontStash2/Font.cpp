@@ -13,6 +13,7 @@
 #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 #error You must use FreeType build with FT_CONFIG_OPTION_SUBPIXEL_RENDERING
 #endif
+#include FT_LCD_FILTER_H
 #endif
 
 namespace FontStash2
@@ -23,8 +24,15 @@ namespace FontStash2
 	{
 		if( nullptr != ftLibrary )
 			return true;
-		const FT_Error ftError = FT_Init_FreeType( &ftLibrary );
-		return ftError == 0;
+		FT_Error ftError = FT_Init_FreeType( &ftLibrary );
+		if( ftError != 0 )
+			return false;
+#ifdef NANOVG_CLEARTYPE
+		ftError = FT_Library_SetLcdFilter( ftLibrary, FT_LCD_FILTER_DEFAULT );
+		if( ftError != 0 )
+			return false;
+#endif
+		return true;
 	}
 
 	bool freetypeDone()

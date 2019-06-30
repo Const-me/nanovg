@@ -44,6 +44,9 @@
     <ClInclude Include="..\..\src\FontStash2\logger.h">
       <Filter>FontStash2</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\FontStash2\debugSaveGlyphs.h">
+      <Filter>FontStash2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="FontStash2">
@@ -80,5 +83,8 @@
       <Filter>FontStash2</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\nanovg.cpp" />
+    <ClCompile Include="..\..\src\FontStash2\debugSaveGlyphs.cpp">
+      <Filter>FontStash2</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

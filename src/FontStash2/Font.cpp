@@ -2,6 +2,7 @@
 #include "Font.h"
 #include "../fontstash.enums.h"
 #include "logger.h"
+#include "debugSaveGlyphs.h"
 
 #include <ft2build.h>
 #include FT_FREETYPE_H
@@ -146,6 +147,8 @@ bool Font::buildGlyphBitmap( int glyph, float size, int *advance, int *lsb, int 
 	*y0 = -ftGlyph->bitmap_top;
 	*y1 = *y0 + ftGlyph->bitmap.rows;
 	logDebug( "Font::buildGlyphBitmap: glyph %i, size %f, outHeight %i", glyph, size, ftGlyph->bitmap.rows );
+
+	debugSaveGlyph( ftGlyph, glyph, size, "gray" );
 	return true;
 }
 
@@ -218,6 +221,8 @@ bool Font::renderCleartypeBitmap( const GlyphValue* glyph, float size, uint32_t 
 		return false;
 
 	FT_GlyphSlot ftGlyph = font->glyph;
+	debugSaveGlyph( ftGlyph, glyph->index, size, "cleartype" );
+
 	assert( ftGlyph->bitmap.rows == outHeight );
 
 	// assert( ftGlyph->bitmap.width == outWidth * 3 );

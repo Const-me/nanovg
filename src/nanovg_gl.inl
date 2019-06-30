@@ -435,6 +435,7 @@ static int glnvg__renderCreate( void* uptr )
 #endif
 		"\n";
 
+	// ==== Vertex Shader ====
 	static const char* fillVertShader = R"fffuuu(
 #ifdef NANOVG_GL3
 	uniform vec2 viewSize;
@@ -454,10 +455,9 @@ void main(void)
 	ftcoord = tcoord;
 	fpos = vertex;
 	gl_Position = vec4(2.0*vertex.x/viewSize.x - 1.0, 1.0 - 2.0*vertex.y/viewSize.y, 0, 1);
-};
-)fffuuu";
+})fffuuu";
 
-	// The main pixel shader
+	// ==== Pixel Shader ====
 	static const char* fillFragShader = R"fffuuu(
 #ifdef GL_ES
 	#if defined(GL_FRAGMENT_PRECISION_HIGH) || defined(NANOVG_GL3)

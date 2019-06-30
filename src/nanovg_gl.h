@@ -15,16 +15,11 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
-#ifndef NANOVG_GL_H
-#define NANOVG_GL_H
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#pragma once
 
 // Create flags
-
-enum NVGcreateFlags {
+enum NVGcreateFlags
+{
 	// Flag indicating if geometry based anti-aliasing is used (may not be needed when using MSAA).
 	NVG_ANTIALIAS 		= 1<<0,
 	// Flag indicating if strokes should be drawn using stencil buffer. The rendering will be a little
@@ -95,15 +90,10 @@ GLuint nvglImageHandleGLES3(NVGcontext* ctx, int image);
 #endif
 
 // These are additional flags on top of NVGimageFlags.
-enum NVGimageFlagsGL {
+enum NVGimageFlagsGL
+{
 	NVG_IMAGE_NODELETE			= 1<<16,	// Do not delete GL texture handle.
 };
-
-#ifdef __cplusplus
-}
-#endif
-
-#endif /* NANOVG_GL_H */
 
 #ifdef NANOVG_GL_IMPLEMENTATION
 #include "nanovg_gl.inl"

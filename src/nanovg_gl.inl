@@ -600,13 +600,13 @@ void main(void)
 #else
 		vec4 color = texture2D(tex, ftcoord);
 #endif
-		color *= scissor;
-		if( color.w < ( 1.0 / 256.0 ) )
+		if( color.w * scissor < ( 1.0 / 256.0 ) )
 			discard;
 
 		// Do the clear type thing
-		result.w = 1.0;
-		result.xyz = color.xyz * innerCol.xyz + ( float3( 1.0 ) - color.xyz ) * outerCol.xyz;
+		vec3 resultRgb = color.xyz * innerCol.xyz + ( float3( 1.0 ) - color.xyz ) * outerCol.xyz;
+		result.xyz = resultRgb * scissor;
+		result.w = scissor;
 	}
 #endif
 #ifdef NANOVG_GL3

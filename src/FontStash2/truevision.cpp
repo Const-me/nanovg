@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <vector>
 #include "truevision.h"
+#include "FileHandles.h"
 
 namespace Truevision
 {
@@ -34,46 +35,11 @@ namespace Truevision
 		uint8_t ImageDescriptor = 0b00100000;
 	};
 
-	// A simple wrapper around FILE* handle from <stdio.h>
-	// Too bad C++ standard library doesn't do a good job about I/O.
-	class WriteFileHandle
-	{
-		FILE* const m_handle;
-
-	public:
-
-		WriteFileHandle( const char* path ) :
-			m_handle( fopen( path, "wb" ) )
-		{ }
-
-		~WriteFileHandle()
-		{
-			if( nullptr != m_handle )
-				fclose( m_handle );
-		}
-
-		operator bool() const
-		{
-			return nullptr != m_handle;
-		}
-
-		bool write( const void* pv, size_t cb )
-		{
-			if( nullptr == m_handle )
-				return false;
-			const size_t written = fwrite( pv, 1, cb, m_handle );
-			return written == cb;
-		}
-
-		template<class E>
-		bool write( const E& e )
-		{
-			return write( &e, sizeof( E ) );
-		}
-	};
-
 	bool saveGrayscale( const uint8_t* source, int w, int h, const char* path )
 	{
+		if( w > 0xFFFF || h > 0xFFFF )
+			return false;
+
 		TgaHeader header;
 		header.ImageType = eImageType::Grayscale;
 		header.Width = (uint16_t)w;
@@ -83,9 +49,9 @@ namespace Truevision
 		WriteFileHandle file{ path };
 		if( !file )
 			return false;
-		if( !file.write( header ) )
+		if( !file.writeStructure( header ) )
 			return false;
-		if( !file.write( source, w*h ) )
+		if( !file.write( source, w * h ) )
 			return false;
 		return true;
 	}
@@ -107,6 +73,9 @@ namespace Truevision
 
 	bool saveColor( const uint32_t* source, int w, int h, const char* path )
 	{
+		if( w > 0xFFFF || h > 0xFFFF )
+			return false;
+
 		std::vector<uint8_t> rgb24;
 		try
 		{
@@ -127,9 +96,9 @@ namespace Truevision
 		WriteFileHandle file{ path };
 		if( !file )
 			return false;
-		if( !file.write( header ) )
+		if( !file.writeStructure( header ) )
 			return false;
-		if( !file.write( rgb24.data(), rgb24.size() ) )
+		if( !file.writeVector( rgb24 ) )
 			return false;
 		return true;
 	}

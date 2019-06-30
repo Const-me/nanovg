@@ -25,6 +25,7 @@
     <ClInclude Include="..\..\src\FontStash2\blur.h" />
     <ClInclude Include="..\..\src\FontStash2\Context.h" />
     <ClInclude Include="..\..\src\FontStash2\debugSaveGlyphs.h" />
+    <ClInclude Include="..\..\src\FontStash2\FileHandles.h" />
     <ClInclude Include="..\..\src\FontStash2\Font.h" />
     <ClInclude Include="..\..\src\FontStash2\logger.h" />
     <ClInclude Include="..\..\src\FontStash2\PlexAlloc\Allocator.hpp" />
@@ -47,6 +48,7 @@
     <ClCompile Include="..\..\src\FontStash2\Context.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Context.dbg.cpp" />
     <ClCompile Include="..\..\src\FontStash2\debugSaveGlyphs.cpp" />
+    <ClCompile Include="..\..\src\FontStash2\FileHandles.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Font.cpp" />
     <ClCompile Include="..\..\src\FontStash2\RamTexture.cpp" />
     <ClCompile Include="..\..\src\FontStash2\truevision.cpp" />

@@ -2,6 +2,7 @@
 #include "fontstash.h"
 #include "FontStash2/Context.h"
 #include "FontStash2/utf8.h"
+#include "FontStash2/FileHandles.h"
 using FontStash2::FONSstate;
 using FontStash2::GlyphValue;
 
@@ -137,26 +138,12 @@ int fonsResetAtlas( FONScontext* stash, int width, int height )
 int fonsAddFont( FONScontext* stash, const char* name, const char* path )
 {
 	// Read in the font data.
-	FILE* const fp = fopen( path, "rb" );
-	if( fp == NULL )
+	ReadFileHandle file{ path };
+	if( !file )
 		return FONS_INVALID;
-	fseek( fp, 0, SEEK_END );
-	const int dataSize = (int)ftell( fp );
-	fseek( fp, 0, SEEK_SET );
 
 	std::vector<uint8_t> data;
-	try
-	{
-		data.resize( dataSize );
-	}
-	catch( std::exception& )
-	{
-		fclose( fp );
-		return FONS_INVALID;
-	}
-	const size_t readed = fread( data.data(), 1, dataSize, fp );
-	fclose( fp );
-	if( readed != dataSize )
+	if( !file.readAllBytes( data ) )
 		return FONS_INVALID;
 
 	return stash->addFont( name, data );

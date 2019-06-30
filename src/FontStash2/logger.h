@@ -8,10 +8,12 @@ inline void logError( const char* pszFormat, ... ) { }
 #else	// NDEBUG
 
 #ifdef _MSC_VER
-// Windows build, colorize the console with WinAPI
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
+#include <stdint.h>
+#define COLOR_LOG_WINAPI
+#define FOREGROUND_BLUE      0x0001 // text color contains blue.
+#define FOREGROUND_GREEN     0x0002 // text color contains green.
+#define FOREGROUND_RED       0x0004 // text color contains red.
+#define FOREGROUND_INTENSITY 0x0008 // text color is intensified.
 
 enum struct eLogColor : uint8_t
 {
@@ -26,19 +28,8 @@ class ConsoleColor
 	uint16_t m_prev;
 
 public:
-
-	ConsoleColor( eLogColor color )
-	{
-		const HANDLE h = GetStdHandle( STD_OUTPUT_HANDLE );
-		CONSOLE_SCREEN_BUFFER_INFO sbi;
-		GetConsoleScreenBufferInfo( h, &sbi );
-		m_prev = sbi.wAttributes;
-		SetConsoleTextAttribute( h, (uint8_t)color );
-	}
-	~ConsoleColor()
-	{
-		SetConsoleTextAttribute( GetStdHandle( STD_OUTPUT_HANDLE ), m_prev );
-	}
+	ConsoleColor( eLogColor color );
+	~ConsoleColor();
 };
 
 #define logDebug( s, ... ) { ConsoleColor _cc( eLogColor::Debug ); printf( s "\n", __VA_ARGS__ ); }

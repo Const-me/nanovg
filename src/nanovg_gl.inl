@@ -601,10 +601,10 @@ void main(void)
 		vec4 color = texture2D(tex, ftcoord);
 #endif
 		float deriv = dFdx( ftcoord.x );
-		if( deriv < 0 )
+		if( deriv < 0.0 )
 			color.xz = color.zx;	// The text is horizontally mirrored, or rotated 180 degrees. Flip red and blue subpixels of the texture.
-		else if ( deriv == 0 )	// The text is rotated 90 degrees. Average all 3 subpixels, disabling ClearType
-			color = vec4( ( color.x + color.y + color.z ) * ( 1.0 / 3.0) );
+		else if ( deriv == 0.0 )	// The text is rotated 90 degrees. Average all 3 subpixels, disabling ClearType
+			color = vec4( ( color.x + color.y + color.z ) * ( 1.0 / 3.0 ) );
 
 		if( color.w * scissor < ( 1.0 / 256.0 ) )
 			discard;

@@ -47,7 +47,6 @@
     <ClCompile Include="..\..\src\FontStash2\blur.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Context.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Context.dbg.cpp" />
-    <ClCompile Include="..\..\src\FontStash2\debugSaveGlyphs.cpp" />
     <ClCompile Include="..\..\src\FontStash2\FileHandles.cpp" />
     <ClCompile Include="..\..\src\FontStash2\Font.cpp" />
     <ClCompile Include="..\..\src\FontStash2\RamTexture.cpp" />

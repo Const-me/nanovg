@@ -67,7 +67,7 @@ namespace FontStash2
 		// Using PlexAlloc from https://github.com/Const-me/CollectionMicrobench to reduce RAM allocations and make it more cache friendly.
 		// Original C code used a fixed size hash map with 256 buckets, with linked list for every bucket, and elements stored in a single vector.
 		// Original is probably slightly faster for small atlases with ~64 glyphs, but this one scales much better.
-		using TAlloc = PlexAlloc::Allocator<std::pair<const GlyphKey, GlyphValue>, 256>;
+		using TAlloc = PlexAlloc::Allocator<std::pair<const GlyphKey, GlyphValue>, 128>;
 		using TGlyphsMap = std::unordered_map<GlyphKey, GlyphValue, GlyphKeyHash, std::equal_to<GlyphKey>, TAlloc>;
 		TGlyphsMap glyphs;
 

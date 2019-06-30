@@ -8,6 +8,7 @@
 #include FT_FREETYPE_H
 #include FT_ADVANCES_H
 #include <math.h>
+#include <algorithm>
 
 #ifdef NANOVG_CLEARTYPE
 #ifndef FT_CONFIG_OPTION_SUBPIXEL_RENDERING

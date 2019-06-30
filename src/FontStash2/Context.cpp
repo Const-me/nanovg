@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <string.h>
 #include "Context.h"
 #include "logger.h"
 using namespace FontStash2;
@@ -218,7 +219,7 @@ GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isi
 	if( iblur > 0 )
 	{
 		scratch.clear();
-		texData.blurRectangle( params.width, glyph->x0, glyph->y0, gw, gh, iblur );
+		ramTexture.blurRectangle( params.width, glyph->x0, glyph->y0, gw, gh, iblur );
 	}
 #endif
 

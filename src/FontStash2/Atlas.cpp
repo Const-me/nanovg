@@ -1,5 +1,6 @@
 #include "Atlas.h"
 #include <algorithm>
+#include <limits.h>
 using namespace FontStash2;
 
 Atlas::Atlas( int w, int h, int nnodes )

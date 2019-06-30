@@ -133,8 +133,6 @@ namespace FontStash2
 
 		GlyphValue* allocGlyph( unsigned int codepoint, short isize, short blur );
 
-		void renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight, int outStride ) const;
-
 #ifdef NANOVG_CLEARTYPE
 		void renderGlyphBitmap( uint32_t *output, int outWidth, int outHeight, int outStride ) const;
 #else

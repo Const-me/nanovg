@@ -1,5 +1,6 @@
 #pragma once
 #include <stdio.h>
+#include <stdint.h>
 #include <vector>
 
 // A simple wrapper around FILE* handle from <stdio.h>

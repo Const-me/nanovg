@@ -1,4 +1,5 @@
 #include <memory>
+#include <string.h>
 #include "fontstash.h"
 #include "FontStash2/Context.h"
 #include "FontStash2/utf8.h"

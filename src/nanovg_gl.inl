@@ -457,6 +457,7 @@ void main(void)
 };
 )fffuuu";
 
+	// The main pixel shader
 	static const char* fillFragShader = R"fffuuu(
 #ifdef GL_ES
 	#if defined(GL_FRAGMENT_PRECISION_HIGH) || defined(NANOVG_GL3)
@@ -599,17 +600,13 @@ void main(void)
 #else
 		vec4 color = texture2D(tex, ftcoord);
 #endif
-		// if( color.x < ( 1.0 / 256.0 ) )
-		//	discard;
-		if (texType == 1)
-			color = vec4(color.xyz*color.w,color.w);
-		if (texType == 2)
-			color = vec4(color.x);
 		color *= scissor;
-		result = color * innerCol;
+		if( color.w < ( 1.0 / 256.0 ) )
+			discard;
 
-		// Debug code, pink background
-		result = result * float4( result.w, result.w, result.w, 1.0 ) + float4( 1, 0.5, 1, 1 ) * ( 1.0 - result.w );
+		// Do the clear type thing
+		result.w = 1.0;
+		result.xyz = color.xyz * innerCol.xyz + ( float3( 1.0 ) - color.xyz ) * outerCol.xyz;
 	}
 #endif
 #ifdef NANOVG_GL3

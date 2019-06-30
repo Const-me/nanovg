@@ -785,6 +785,15 @@ void nvgFillColor( NVGcontext* ctx, NVGcolor color )
 	nvg__setPaintColor( &state->fill, color );
 }
 
+void nvgTextColor( NVGcontext* ctx, NVGcolor foreground, NVGcolor background )
+{
+	NVGstate* state = nvg__getState( ctx );
+	nvg__setPaintColor( &state->fill, foreground );
+#ifdef NANOVG_CLEARTYPE
+	state->fill.outerColor = background;
+#endif
+}
+
 void nvgFillPaint( NVGcontext* ctx, NVGpaint paint )
 {
 	NVGstate* state = nvg__getState( ctx );

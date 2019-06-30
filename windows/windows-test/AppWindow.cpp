@@ -46,16 +46,30 @@ void AppWindow::initScene( CSize viewportSize )
 
 void AppWindow::drawScene( float SecsElapsed )
 {
-	nvgBeginFrame( vg, windowSize.x, windowSize.y, pxRatio );
-	nvgFillColor( vg, nvgRGB( 0xCC, 0xCC, 0xCC ) );
+	const NVGcolor lightGray = nvgRGB( 0xCC, 0xCC, 0xCC );
+	const NVGcolor black = nvgRGB( 0, 0, 0 );
+	const NVGcolor white = nvgRGB( 0xFF, 0xFF, 0xFF );
+
+	nvgBeginFrame( vg, windowSize.x, windowSize.y, 1.0f );
+	nvgFillColor( vg, lightGray );
+	nvgBeginPath( vg );
 	nvgRect( vg, 0, 0, windowSize.x, windowSize.y );
 	nvgFill( vg );
 
 	nvgFontFace( vg, "Consolas" );
 	nvgTextAlign( vg, NVG_ALIGN_TOP | NVG_ALIGN_CENTER );
 	nvgFontSize( vg, 48 );
-	nvgFillColor( vg, nvgRGB( 0, 0, 0 ) );
-	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.5f, "Hello, World", nullptr );
+
+	nvgTextColor( vg, black, lightGray );
+	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.5f, "Black on light", nullptr );
+
+	nvgFillColor( vg, black );
+	nvgBeginPath( vg );
+	nvgRect( vg, 0, 0, windowSize.x, windowSize.y * 0.33f );
+	nvgFill( vg );
+
+	nvgTextColor( vg, white, black );
+	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.25f, "White on black", nullptr );
 
 	nvgEndFrame( vg );
 

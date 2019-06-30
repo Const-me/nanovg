@@ -109,7 +109,7 @@ int Context::addFont( const char* name, std::vector<uint8_t>& data )
 		fonts.emplace_back( std::move( up ) );
 		return res;
 	}
-	catch( std::exception& )
+	catch( const std::exception& )
 	{
 		return FONS_INVALID;
 	}

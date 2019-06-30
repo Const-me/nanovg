@@ -14,7 +14,7 @@ bool ReadFileHandle::readAllBytes( std::vector<uint8_t> &data )
 	{
 		data.resize( dataSize );
 	}
-	catch( std::exception& )
+	catch( const std::exception& )
 	{
 		return false;
 	}

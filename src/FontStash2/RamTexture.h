@@ -28,7 +28,7 @@ namespace FontStash2
 
 		bool addGlyph( Font& font, int textureWidth, const GlyphValue* glyph, int pad );
 
-		void blurRectangle( int textureWidth, int x, int y, int w, int h, short iblur );
+		void blurRectangle( int textureWidth, int x, int y, int w, int h, short iblur ) { }
 
 		bool save( int w, int h, const char* path ) const;
 	};

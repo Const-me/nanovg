@@ -11,7 +11,7 @@ bool RamTexture<T>::resize( int width, int height )
 	{
 		texture.resize( width * height );
 	}
-	catch( std::exception& )
+	catch( const std::exception& )
 	{
 		return false;
 	}
@@ -27,7 +27,7 @@ bool RamTexture<T>::expand( int oldWidth, int oldHeight, int width, int height )
 	{
 		data.resize( width * height );
 	}
-	catch( std::exception& )
+	catch( const std::exception& )
 	{
 		return false;
 	}
@@ -96,17 +96,14 @@ bool RamTexture<T>::addGlyph( Font& font, int textureWidth, const GlyphValue* gl
 }
 
 #ifdef NANOVG_CLEARTYPE
-template class RamTexture<uint32_t>;
-
 template<>
 bool RamTexture<uint32_t>::save( int w, int h, const char* path ) const
 {
 	return Truevision::saveColor( texture.data(), w, h, path );
 }
 
+template class RamTexture<uint32_t>;
 #else
-template class RamTexture<uint8_t>;
-
 template<>
 void RamTexture<uint8_t>::blurRectangle( int textureWidth, int x, int y, int w, int h, short iblur )
 {
@@ -119,4 +116,6 @@ bool RamTexture<uint8_t>::save( int w, int h, const char* path ) const
 {
 	return Truevision::saveGrayscale( texture.data(), w, h, path );
 }
+
+template class RamTexture<uint8_t>;
 #endif

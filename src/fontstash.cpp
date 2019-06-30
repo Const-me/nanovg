@@ -18,7 +18,7 @@ FONScontext* fonsCreateInternal( FONSparams* params )
 			return nullptr;
 		return up.release();
 	}
-	catch( std::exception& )
+	catch( const std::exception& )
 	{
 		return nullptr;
 	}

@@ -81,7 +81,7 @@ namespace Truevision
 		{
 			rgb24.resize( w * h * 3 );
 		}
-		catch( std::exception& )
+		catch( const std::exception& )
 		{
 			return false;
 		}

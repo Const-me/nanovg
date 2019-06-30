@@ -49,11 +49,13 @@ void AppWindow::drawScene( float SecsElapsed )
 	const NVGcolor lightGray = nvgRGB( 0xCC, 0xCC, 0xCC );
 	const NVGcolor black = nvgRGB( 0, 0, 0 );
 	const NVGcolor white = nvgRGB( 0xFF, 0xFF, 0xFF );
+	const float w = windowSize.x;
+	const float h = windowSize.y;
 
-	nvgBeginFrame( vg, windowSize.x, windowSize.y, 1.0f );
+	nvgBeginFrame( vg, w, h, 1.0f );
 	nvgFillColor( vg, lightGray );
 	nvgBeginPath( vg );
-	nvgRect( vg, 0, 0, windowSize.x, windowSize.y );
+	nvgRect( vg, 0, 0, w, h );
 	nvgFill( vg );
 
 	nvgFontFace( vg, "Consolas" );
@@ -61,15 +63,25 @@ void AppWindow::drawScene( float SecsElapsed )
 	nvgFontSize( vg, 48 );
 
 	nvgTextColor( vg, black, lightGray );
-	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.5f, "Black on light", nullptr );
+	nvgText( vg, w * 0.5f, h * 0.5f, "Black on light", nullptr );
 
 	nvgFillColor( vg, black );
 	nvgBeginPath( vg );
-	nvgRect( vg, 0, 0, windowSize.x, windowSize.y * 0.33f );
+	nvgRect( vg, 0, 0, w, h * 0.33f );
 	nvgFill( vg );
 
 	nvgTextColor( vg, white, black );
-	nvgText( vg, windowSize.x * 0.5f, windowSize.y * 0.25f, "White on black", nullptr );
+	nvgText( vg, w * 0.5f, h * 0.25f, "White on black", nullptr );
+
+	nvgFillColor( vg, black );
+	nvgBeginPath( vg );
+	nvgRect( vg, 0, h * 0.6667f, w, h * 0.3333f );
+	nvgFill( vg );
+
+	nvgTextColor( vg, white, black );
+	nvgRotate( vg, nvgDegToRad( 180.0 ) );
+	nvgTranslate( vg, -w, -h );
+	nvgText( vg, w * 0.5f, h * 0.25f, "White on black", nullptr );
 
 	nvgEndFrame( vg );
 

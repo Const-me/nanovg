@@ -47,6 +47,11 @@
 
 #define NVG_COUNTOF(arr) (sizeof(arr) / sizeof(0[arr]))
 
+#ifdef NANOVG_CLEARTYPE
+constexpr NVGtexture fontAtlasTextureType = NVG_TEXTURE_RGBA;
+#else
+constexpr NVGtexture fontAtlasTextureType = NVG_TEXTURE_ALPHA;
+#endif
 
 enum NVGcommands {
 	NVG_MOVETO = 0,
@@ -323,7 +328,7 @@ NVGcontext* nvgCreateInternal( NVGparams* params )
 	if( ctx->fs == NULL ) goto error;
 
 	// Create font texture
-	ctx->fontImages[ 0 ] = ctx->params.renderCreateTexture( ctx->params.userPtr, NVG_TEXTURE_ALPHA, fontParams.width, fontParams.height, 0, NULL );
+	ctx->fontImages[ 0 ] = ctx->params.renderCreateTexture( ctx->params.userPtr, fontAtlasTextureType, fontParams.width, fontParams.height, 0, NULL );
 	if( ctx->fontImages[ 0 ] == 0 ) goto error;
 	ctx->fontImageIdx = 0;
 
@@ -2398,7 +2403,7 @@ static void nvg__flushTextTexture( NVGcontext* ctx )
 		// Update texture
 		if( fontImage != 0 ) {
 			int iw, ih;
-			const unsigned char* data = fonsGetTextureData( ctx->fs, &iw, &ih );
+			const unsigned char* data = (const unsigned char*)fonsGetTextureData( ctx->fs, &iw, &ih );
 			int x = dirty[ 0 ];
 			int y = dirty[ 1 ];
 			int w = dirty[ 2 ] - dirty[ 0 ];
@@ -2425,7 +2430,7 @@ static int nvg__allocTextAtlas( NVGcontext* ctx )
 			iw *= 2;
 		if( iw > NVG_MAX_FONTIMAGE_SIZE || ih > NVG_MAX_FONTIMAGE_SIZE )
 			iw = ih = NVG_MAX_FONTIMAGE_SIZE;
-		ctx->fontImages[ ctx->fontImageIdx + 1 ] = ctx->params.renderCreateTexture( ctx->params.userPtr, NVG_TEXTURE_ALPHA, iw, ih, 0, NULL );
+		ctx->fontImages[ ctx->fontImageIdx + 1 ] = ctx->params.renderCreateTexture( ctx->params.userPtr, fontAtlasTextureType, iw, ih, 0, NULL );
 	}
 	++ctx->fontImageIdx;
 	fonsResetAtlas( ctx->fs, iw, ih );
@@ -2931,10 +2936,9 @@ void nvgTextMetrics( NVGcontext* ctx, float* ascender, float* descender, float* 
 		*lineh *= invscale;
 }
 
-int nvgDebugDumpFontAtlas( NVGcontext* ctx, const char* grayscale, const char* cleartype )
+int nvgDebugDumpFontAtlas( NVGcontext* ctx, const char* path )
 {
 	if( nullptr == ctx || nullptr == ctx->fs )
 		return 0;
-	return fonsDebugDumpAtlas( ctx->fs, grayscale, cleartype );
+	return fonsDebugDumpAtlas( ctx->fs, path );
 }
-// vim: ft=c nu noet ts=4

@@ -47,8 +47,11 @@ namespace FontStash2
 		FONSparams params;
 		float itw, ith;
 
-		RamTexture<uint8_t> texData;
-		RamTexture<uint32_t> cleartypeTexture;
+#ifdef NANOVG_CLEARTYPE
+		RamTexture<uint32_t> ramTexture;
+#else
+		RamTexture<uint8_t> ramTexture;
+#endif
 		int dirtyRect[ 4 ];
 		std::vector<std::unique_ptr<FontStash2::Font>> fonts;
 		FontStash2::Atlas atlas;
@@ -91,6 +94,6 @@ namespace FontStash2
 
 		int addFont( const char* name, std::vector<uint8_t>& data );
 
-		int debugDumpAtlas( const char* grayscale, const char* cleartype ) const;
+		int debugDumpAtlas( const char* path ) const;
 	};
 }

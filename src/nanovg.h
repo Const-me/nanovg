@@ -675,7 +675,7 @@ NVGparams* nvgInternalParams(NVGcontext* ctx);
 // Debug function to dump cached path data.
 void nvgDebugDumpPathCache(NVGcontext* ctx);
 
-int nvgDebugDumpFontAtlas( NVGcontext* ctx, const char* grayscale, const char* cleartype );
+int nvgDebugDumpFontAtlas( NVGcontext* ctx, const char* path );
 
 #ifdef _MSC_VER
 #pragma warning(pop)

@@ -17,6 +17,7 @@
 //
 
 #pragma once
+#include <stdint.h>
 #include "fontstash.enums.h"
 
 namespace FontStash2
@@ -104,7 +105,11 @@ int fonsTextIterInit( FONScontext* stash, FONStextIter* iter, float x, float y, 
 int fonsTextIterNext( FONScontext* stash, FONStextIter* iter, struct FONSquad* quad );
 
 // Pull texture changes
-const unsigned char* fonsGetTextureData( FONScontext* stash, int* width, int* height );
+#ifdef NANOVG_CLEARTYPE
+const uint32_t* fonsGetTextureData( FONScontext* stash, int* width, int* height );
+#else
+const uint8_t* fonsGetTextureData( FONScontext* stash, int* width, int* height );
+#endif
 int fonsValidateTexture( FONScontext* s, int* dirty );
 
 // Draws the stash texture for debugging
@@ -112,4 +117,4 @@ void fonsDrawDebug( FONScontext* s, float x, float y );
 
 int fonsAddFallbackFont( FONScontext* stash, int base, int fallback );
 
-int fonsDebugDumpAtlas( FONScontext* stash, const char* grayscale, const char* cleartype );
+int fonsDebugDumpAtlas( FONScontext* stash, const char* path );

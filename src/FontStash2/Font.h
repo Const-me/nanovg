@@ -37,17 +37,27 @@ namespace FontStash2
 		{
 			unsigned int codepoint;
 			short size;
+#ifndef NANOVG_CLEARTYPE
 			short blur;
-
+#endif
 			bool operator == ( const GlyphKey &k ) const
 			{
-				return codepoint == k.codepoint && size == k.size && blur == k.blur;
+				return codepoint == k.codepoint && size == k.size 
+#ifndef NANOVG_CLEARTYPE
+					&& blur == k.blur
+#endif
+				;
 			}
 
 			GlyphKey() = default;
 
+#ifdef NANOVG_CLEARTYPE
+			GlyphKey( unsigned int cp, short s, short b ) :
+				codepoint( cp ), size( s ) { }
+#else
 			GlyphKey( unsigned int cp, short s, short b ) :
 				codepoint( cp ), size( s ), blur( b ) { }
+#endif
 		};
 
 		// Hasher for the above structure, for std::unordered_map
@@ -58,7 +68,9 @@ namespace FontStash2
 				std::size_t hash = 17;
 				hash = hash * 31 + k.codepoint;
 				hash = hash * 31 + (uint16_t)k.size;
+#ifndef NANOVG_CLEARTYPE
 				hash = hash * 31 + (uint16_t)k.blur;
+#endif
 				return hash;
 			}
 		};
@@ -124,7 +136,9 @@ namespace FontStash2
 		void renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight, int outStride ) const;
 
 #ifdef NANOVG_CLEARTYPE
-		bool renderCleartypeBitmap( const GlyphValue* glyph, float size, uint32_t *output, int outWidth, int outHeight, int outStride ) const;
+		void renderGlyphBitmap( uint32_t *output, int outWidth, int outHeight, int outStride ) const;
+#else
+		void renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight, int outStride ) const;
 #endif
 
 		float getVertAlign( bool zeroTopLeft, int align, short isize ) const;

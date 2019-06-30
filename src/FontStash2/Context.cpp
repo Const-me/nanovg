@@ -1,5 +1,6 @@
 #include <algorithm>
 #include "Context.h"
+#include "logger.h"
 using namespace FontStash2;
 
 Context::Context( FONSparams* p ) :
@@ -20,8 +21,7 @@ bool Context::initStuff()
 	fonts.reserve( FONS_INIT_FONTS );
 
 	// Create texture for the cache
-	texData.resize( params.width, params.height );
-	cleartypeTexture.resize( params.width, params.height );
+	ramTexture.resize( params.width, params.height );
 
 	dirtyRect[ 0 ] = params.width;
 	dirtyRect[ 1 ] = params.height;
@@ -44,8 +44,7 @@ void Context::addWhiteRect( int w, int h )
 		return;
 
 	// Rasterize
-	texData.addWhiteRect( params.width, gx, gy, w, h );
-	cleartypeTexture.addWhiteRect( params.width, gx, gy, w, h );
+	ramTexture.addWhiteRect( params.width, gx, gy, w, h );
 
 	dirtyRect[ 0 ] = std::min( dirtyRect[ 0 ], gx );
 	dirtyRect[ 1 ] = std::min( dirtyRect[ 1 ], gy );
@@ -118,6 +117,19 @@ int Context::addFont( const char* name, std::vector<uint8_t>& data )
 
 GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isize, short iblur, int bitmapOption )
 {
+#ifdef NANOVG_CLEARTYPE
+	if( iblur != 0 )
+	{
+		iblur = 0;	// It's technically possible to implement clear type-aware blur, I just don't need it.
+		static bool warned = false;
+		if( !warned )
+		{
+			warned = false;
+			logWarning( "ClearType build is currently incompatible with blurred fonts. Disabled the blur." );
+		}
+	}
+	
+#endif
 	const float size = isize / 10.0f;
 	FONSfont* renderFont = &font;
 
@@ -199,15 +211,16 @@ GlyphValue* Context::getGlyph( FONSfont& font, unsigned int codepoint, short isi
 		return glyph;
 
 	// Rasterize
-	texData.addGlyph( font, params.width, glyph, pad );
-	cleartypeTexture.addCleartypeGlyph( font, size, params.width, glyph, pad );
+	ramTexture.addGlyph( font, params.width, glyph, pad );
 
+#ifndef NANOVG_CLEARTYPE
 	// Blur
 	if( iblur > 0 )
 	{
 		scratch.clear();
 		texData.blurRectangle( params.width, glyph->x0, glyph->y0, gw, gh, iblur );
 	}
+#endif
 
 	dirtyRect[ 0 ] = std::min( dirtyRect[ 0 ], (int)glyph->x0 );
 	dirtyRect[ 1 ] = std::min( dirtyRect[ 1 ], (int)glyph->y0 );
@@ -268,7 +281,7 @@ void Context::flush()
 	if( dirtyRect[ 0 ] < dirtyRect[ 2 ] && dirtyRect[ 1 ] < dirtyRect[ 3 ] )
 	{
 		if( params.renderUpdate != NULL )
-			params.renderUpdate( params.userPtr, dirtyRect, texData.data() );
+			params.renderUpdate( params.userPtr, dirtyRect, (const uint8_t*)ramTexture.data() );
 		// Reset dirty rect
 		dirtyRect[ 0 ] = params.width;
 		dirtyRect[ 1 ] = params.height;

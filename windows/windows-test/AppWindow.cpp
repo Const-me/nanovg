@@ -62,6 +62,10 @@ void AppWindow::drawScene( float SecsElapsed )
 	if( bResized )
 	{
 		bResized = false;
-		nvgDebugDumpFontAtlas( vg, R"(C:\Temp\2remove\VG\gray.tga)", R"(C:\Temp\2remove\VG\cleartype.tga)" );
+		static int sn = 0;
+		sn++;
+		CStringA path;
+		path.Format( R"(C:\Temp\2remove\VG\atlas-%03i.tga)", sn );
+		nvgDebugDumpFontAtlas( vg, path );
 	}
 }

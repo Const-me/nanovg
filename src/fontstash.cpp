@@ -67,9 +67,7 @@ int fonsExpandAtlas( FONScontext* stash, int width, int height )
 			return 0;
 	}
 
-	if( !stash->texData.expand( stash->params.width, stash->params.height, width, height ) )
-		return 0;
-	if( !stash->cleartypeTexture.expand( stash->params.width, stash->params.height, width, height ) )
+	if( !stash->ramTexture.expand( stash->params.width, stash->params.height, width, height ) )
 		return 0;
 
 	// Increase atlas size
@@ -109,9 +107,7 @@ int fonsResetAtlas( FONScontext* stash, int width, int height )
 	stash->atlas.reset( width, height );
 
 	// Clear texture data
-	if( !stash->texData.resize( width, height ) )
-		return 0;
-	if( !stash->cleartypeTexture.resize( width, height ) )
+	if( !stash->ramTexture.resize( width, height ) )
 		return 0;
 
 	// Reset dirty rect
@@ -502,13 +498,17 @@ int fonsTextIterNext( FONScontext* stash, FONStextIter* iter, FONSquad* quad )
 }
 
 // ===== Pull texture changes =====
-const unsigned char* fonsGetTextureData( FONScontext* stash, int* width, int* height )
+#ifdef NANOVG_CLEARTYPE
+const uint32_t* fonsGetTextureData( FONScontext* stash, int* width, int* height )
+#else
+const uint8_t* fonsGetTextureData( FONScontext* stash, int* width, int* height )
+#endif
 {
 	if( width != NULL )
 		*width = stash->params.width;
 	if( height != NULL )
 		*height = stash->params.height;
-	return stash->texData.data();
+	return stash->ramTexture.data();
 }
 
 int fonsValidateTexture( FONScontext* stash, int* dirty )
@@ -582,7 +582,7 @@ int fonsAddFallbackFont( FONScontext* stash, int base, int fallback )
 	return baseFont->tryAddFallback( fallback );
 }
 
-int fonsDebugDumpAtlas( FONScontext* stash, const char* grayscale, const char* cleartype )
+int fonsDebugDumpAtlas( FONScontext* stash, const char* path )
 {
-	return stash->debugDumpAtlas( grayscale, cleartype );
+	return stash->debugDumpAtlas( path );
 }

@@ -38,6 +38,11 @@ namespace FontStash2
 
 	constexpr FT_Int32 loadFlagsNormal = FT_LOAD_RENDER | FT_LOAD_FORCE_AUTOHINT;
 	constexpr FT_Int32 loadFlagsClearType = loadFlagsNormal | FT_LOAD_TARGET_LCD;
+#ifdef NANOVG_CLEARTYPE
+	constexpr FT_Int32 loadFlags = loadFlagsClearType;
+#else
+	constexpr FT_Int32 loadFlags = loadFlagsNormal;
+#endif
 }
 
 using namespace FontStash2;
@@ -133,7 +138,7 @@ bool Font::buildGlyphBitmap( int glyph, float size, int *advance, int *lsb, int 
 {
 	FT_Error ftError = FT_Set_Pixel_Sizes( font, 0, (FT_UInt)( size * (float)font->units_per_EM / (float)( font->ascender - font->descender ) ) );
 	if( ftError ) return false;
-	ftError = FT_Load_Glyph( font, glyph, loadFlagsNormal );
+	ftError = FT_Load_Glyph( font, glyph, loadFlags );
 	if( ftError ) return false;
 
 	FT_Fixed advFixed;
@@ -143,7 +148,12 @@ bool Font::buildGlyphBitmap( int glyph, float size, int *advance, int *lsb, int 
 	*advance = (int)advFixed;
 	*lsb = (int)ftGlyph->metrics.horiBearingX;
 	*x0 = ftGlyph->bitmap_left;
+#ifdef NANOVG_CLEARTYPE
+	assert( 0 == ( ftGlyph->bitmap.width % 3 ) );
+	*x1 = *x0 + ftGlyph->bitmap.width / 3;
+#else
 	*x1 = *x0 + ftGlyph->bitmap.width;
+#endif
 	*y0 = -ftGlyph->bitmap_top;
 	*y1 = *y0 + ftGlyph->bitmap.rows;
 	logDebug( "Font::buildGlyphBitmap: glyph %i, size %f, outHeight %i", glyph, size, ftGlyph->bitmap.rows );
@@ -156,22 +166,6 @@ GlyphValue* Font::allocGlyph( unsigned int codepoint, short isize, short blur )
 {
 	const GlyphKey key{ codepoint, isize, blur };
 	return &glyphs[ key ];
-}
-
-void Font::renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight, int outStride ) const
-{
-	FT_GlyphSlot ftGlyph = font->glyph;
-	const uint8_t* sourceLine = ftGlyph->bitmap.buffer;	// Read pointer
-	const size_t sourceStride = ftGlyph->bitmap.pitch;	// Bytes to skip between source lines
-	const size_t lineWidth = ftGlyph->bitmap.width;	// Bytes to copy per each line
-	const uint32_t height = ftGlyph->bitmap.rows;	// Rows to copy
-
-	for( uint32_t y = 0; y < height; y++ )
-	{
-		std::copy_n( sourceLine, lineWidth, output );
-		sourceLine += sourceStride;
-		output += outStride;
-	}
 }
 
 #ifdef NANOVG_CLEARTYPE
@@ -190,10 +184,13 @@ inline uint32_t packCleartypeSubpixels( const uint8_t* triple )
 	return res;
 }
 
-inline void copyCleartypeGlyph( FT_GlyphSlot ftGlyph, uint32_t *output, int outStride, int rgbWidth )
+void Font::renderGlyphBitmap( uint32_t *output, int outWidth, int outHeight, int outStride ) const
 {
+	FT_GlyphSlot ftGlyph = font->glyph;
+	const int rgbWidth = ftGlyph->bitmap.width / 3;
 	const uint8_t* sourceLine = ftGlyph->bitmap.buffer;
 	const size_t sourceStride = ftGlyph->bitmap.pitch;
+
 	for( uint32_t y = 0; y < ftGlyph->bitmap.rows; y++ )
 	{
 		const uint8_t* src = sourceLine;
@@ -209,44 +206,23 @@ inline void copyCleartypeGlyph( FT_GlyphSlot ftGlyph, uint32_t *output, int outS
 	}
 }
 
-bool Font::renderCleartypeBitmap( const GlyphValue* glyph, float size, uint32_t *output, int outWidth, int outHeight, int outStride ) const
+#else
+
+void Font::renderGlyphBitmap( unsigned char *output, int outWidth, int outHeight, int outStride ) const
 {
-	logDebug( "renderCleartypeBitmap: glyph %i, size %f, outHeight %i", glyph->index, size, outHeight );
-
-	FT_Error ftError = FT_Set_Pixel_Sizes( font, 0, (FT_UInt)( size * (float)font->units_per_EM / (float)( font->ascender - font->descender ) ) );
-	if( ftError ) return false;
-
-	ftError = FT_Load_Glyph( font, glyph->index, loadFlagsClearType );
-	if( ftError )
-		return false;
-
 	FT_GlyphSlot ftGlyph = font->glyph;
-	debugSaveGlyph( ftGlyph, glyph->index, size, "cleartype" );
+	const uint8_t* sourceLine = ftGlyph->bitmap.buffer;	// Read pointer
+	const size_t sourceStride = ftGlyph->bitmap.pitch;	// Bytes to skip between source lines
+	const uint32_t height = ftGlyph->bitmap.rows;	// Rows to copy
 
-	assert( ftGlyph->bitmap.rows == outHeight );
+	const size_t lineWidth = ftGlyph->bitmap.width;	// Bytes to copy per each line
 
-	// assert( ftGlyph->bitmap.width == outWidth * 3 );
-	// ClearType bitmap width slightly difffers from outWidth * 3.
-	assert( 0 == ( ftGlyph->bitmap.width % 3 ) );
-	const int rgbWidth = ftGlyph->bitmap.width / 3;
-
-	if( rgbWidth <= outWidth )
+	for( uint32_t y = 0; y < height; y++ )
 	{
-		// Copy everything, to the same positions.
-		copyCleartypeGlyph( ftGlyph, output, outStride, rgbWidth );
-		return true;
+		std::copy_n( sourceLine, lineWidth, output );
+		sourceLine += sourceStride;
+		output += outStride;
 	}
-
-	if( rgbWidth <= outWidth + 4 )
-	{
-		// We have at least 2 pixels padding, use that space
-		output -= ( rgbWidth - outWidth ) / 2;
-		copyCleartypeGlyph( ftGlyph, output, outStride, rgbWidth );
-		return true;
-	}
-
-	assert( false );
-	return false;
 }
 #endif
 

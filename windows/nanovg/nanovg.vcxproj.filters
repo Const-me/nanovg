@@ -93,4 +93,7 @@
       <Filter>FontStash2</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\nanovg_gl.inl" />
+  </ItemGroup>
 </Project>

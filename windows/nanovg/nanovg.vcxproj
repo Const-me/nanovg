@@ -55,6 +55,9 @@
     <ClCompile Include="..\..\src\FontStash2\utf8.cpp" />
     <ClCompile Include="..\..\src\nanovg.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\src\nanovg_gl.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{D17A59D8-BB33-4B22-9CE2-54FA8E369DC6}</ProjectGuid>

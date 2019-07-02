@@ -58,6 +58,11 @@ void AppWindow::drawScene( float SecsElapsed )
 	nvgRect( vg, 0, 0, w, h );
 	nvgFill( vg );
 
+	m_time += SecsElapsed * 0.25f;
+	if( m_time > 1 )
+		m_time = 0;
+	nvgGlobalAlpha( vg, (float)m_time );
+
 	nvgFontFace( vg, "Consolas" );
 	nvgTextAlign( vg, NVG_ALIGN_TOP | NVG_ALIGN_CENTER );
 	nvgFontSize( vg, 48 );

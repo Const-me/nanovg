@@ -606,13 +606,13 @@ void main(void)
 		else if ( deriv == 0.0 )	// The text is rotated 90 degrees. Average all 3 subpixels, disabling ClearType
 			color = vec4( ( color.x + color.y + color.z ) * ( 1.0 / 3.0 ) );
 
-		if( color.w * scissor < ( 1.0 / 256.0 ) )
+		if( color.w * scissor * innerCol.w < ( 1.0 / 256.0 ) )
 			discard;
 
 		// Do the clear type thing
-		vec3 resultRgb = color.xyz * innerCol.xyz + ( vec3( 1.0 ) - color.xyz ) * outerCol.xyz;
-		result.xyz = resultRgb * scissor;
-		result.w = scissor;
+		result.xyz = color.xyz * innerCol.xyz + ( vec3( innerCol.w ) - color.xyz ) * outerCol.xyz;
+		result.w = innerCol.w;
+		result *= scissor;
 	}
 #endif
 #ifdef NANOVG_GL3
@@ -621,6 +621,10 @@ void main(void)
 	gl_FragColor = result;
 #endif
 })fffuuu";
+	// The default NVG blending state appears to be premultiplied alpha.
+	// nvgReset() converts NVG_SOURCE_OVER constant into NVG_ONE / NVG_ONE_MINUS_SRC_ALPHA values.
+	// This maps into GL_ONE / GL_ONE_MINUS_SRC_ALPHA values, for source and destination blending.
+	// Also, NVG pre-multiplies both colors, in glnvg__premulColor, called from glnvg__convertPaint
 
 	glnvg__checkError( gl, "init" );
 

@@ -29,4 +29,5 @@ private:
 	Vector2 windowSize;
 	int consolasFont;
 	bool bResized = true;
+	double m_time = 0;
 };

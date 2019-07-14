@@ -22,12 +22,17 @@ private:
 
 	void initScene( CSize viewportSize ) override;
 
+	void drawAlphaAnimation( float SecsElapsed );
+	void drawPangrams();
+
 	void drawScene( float SecsElapsed ) override;
 
 	NVGcontext* vg = nullptr;
 	float pxRatio;
 	Vector2 windowSize;
-	int consolasFont;
+	int consolasFont, calibriFont;
 	bool bResized = true;
 	double m_time = 0;
+
+	bool m_bFirstFrame = true;
 };
